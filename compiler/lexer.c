@@ -73,7 +73,7 @@ void addLiteralToken(token *tokens, int index, char *lexeme, int lexemeLen)
     }
     else if (strcmp(lexeme, "int"))
     {
-        tokens[index].type = INT;
+        tokens[index].type = KEYWORD_INT;
     }
     else
     {
@@ -132,7 +132,7 @@ void addPunctuationToken(token *tokens, int index, char *lexeme)
             tokens[index].type = CLOSED_PAR;
             break;
         case ';':
-            tokens[index].type = SEMI_COLON;
+            tokens[index].type = SEMICOLON;
             break;
     }
     tokens[index].lexeme = malloc(sizeof(char) * (2));
