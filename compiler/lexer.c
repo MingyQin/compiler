@@ -31,7 +31,7 @@ int scanWord(char first, char *buffer, FILE *file)
             }
         }
         c = fgetc(file);
-    } while(isalpha(c) && c != EOF);
+    } while((isalpha(c) || isalnum(c)) && c != EOF);
     buffer[i] = '\0';
 
     return i+1;
@@ -58,7 +58,7 @@ int scanNum(char first, char *buffer, FILE *file)
             }
         }
         c = fgetc(file);
-    } while(isalnum(c) && c != EOF);
+    } while(isdigit(c) && c != EOF);
     buffer[i] = '\0';
 
     return i+1;
@@ -71,7 +71,7 @@ void addLiteralToken(token *tokens, int index, char *lexeme, int lexemeLen)
     {
         tokens[index].type = RETURN;
     }
-    else if (strcmp(lexeme, "int"))
+    else if (strcmp(lexeme, "int") == 0)
     {
         tokens[index].type = KEYWORD_INT;
     }
@@ -186,7 +186,7 @@ int lexFile(FILE *file, token *tokens)
             fseek(file, -1, SEEK_CUR);
             c = fgetc(file);
         }  
-        else if (isalnum(c)) // Numbers are stored as strings for now
+        else if (isdigit(c)) // Numbers are stored as strings for now
         {
             int numLength = scanNum(c, buffer, file);
             addIntegerToken(tokens, index, buffer, numLength);
