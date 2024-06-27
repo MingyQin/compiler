@@ -61,6 +61,13 @@ int main(int argc, char *argv[])
 
     // Root node of the AST
     program *ast = parseProgram();
+    if (ast == NULL)
+    {
+        printf("Couldn't create ast");
+        freeTokens(tokens, num_tokens);
+        fclose(file);
+        return 1;
+    }
 
 
     // Free the tokens 

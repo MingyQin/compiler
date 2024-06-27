@@ -9,19 +9,39 @@
 program *parseProgram()
 {
     program *p = malloc(sizeof(program));
-    p->func = parseFunc();
+    if (p == NULL)
+    {
+        printf("Memory allocation failed\n");
+        return NULL;
+    }
+
+    function *f = parseFunc();
+    if (f == NULL)
+    {
+        free(p);
+        return NULL;
+    }
+    p->func = f;
     return p;
 }
 
+// Returns NULL if something went wrong
 function *parseFunc()
 {
     function *f = malloc(sizeof(function));
+    if (f == NULL)
+    {
+        printf("Memory allocation failed\n");
+        return NULL;
+    }
+
     token *tok = nextToken();
     // For now functions can only be of type INT
     if (tok == NULL || tok->type != KEYWORD_INT)
     {
         printf("Missing function return type\n");
-        exit(1);
+        free(f);
+        return NULL;
     }
 
     // Look for and set function ID
@@ -29,7 +49,8 @@ function *parseFunc()
     if (tok == NULL || tok->type != IDENTIFIER)
     {
         printf("Missing function name\n");
-        exit(1);
+        free(f);
+        return NULL;
     }
     // Point the pointer to the same memory as pointed to by the token's lexeme property
     // This memory is later freed by freeTokens() not freeFunc()
@@ -40,13 +61,16 @@ function *parseFunc()
     if (tok == NULL || tok->type != OPEN_PAR)
     {
         printf("Missing parentheses\n");
-        exit(1);
+        free(f);
+        return NULL;
+
     }
     tok = nextToken();
     if (tok == NULL || tok->type != CLOSED_PAR)
     {
         printf("Missing parentheses\n");
-        exit(1);
+        free(f);
+        return NULL;
     }
 
     // Function body
@@ -54,18 +78,26 @@ function *parseFunc()
     if (tok == NULL || tok->type != OPEN_BRACE)
     {
         printf("Missing bracket\n");
-        exit(1);
+        free(f);
+        return NULL;
     }
 
     // Parse statement
-    f->statement = parseStatement();
+    statement *s= parseStatement();
+    // If the statement couldn't be parsed return NULL
+    if (s == NULL)
+    {
+        free(f);
+        return NULL;
+    }
+    f->statement = s;
+    
     tok = nextToken();
-
-
     if (tok == NULL || tok->type != CLOSED_BRACE)
     {
         printf("Missing bracket\n");
-        exit(1);
+        free(f);
+        return NULL;
     }
     return f;
 }
@@ -73,24 +105,37 @@ function *parseFunc()
 statement *parseStatement()
 {
     statement *s = malloc(sizeof(statement));
+    if (s == NULL)
+    {
+        printf("Memory allocation failed\n");
+        return NULL;
+    }
 
     // Check for return statement
     token *tok = nextToken();
     if (tok == NULL || tok->type != RETURN)
     {
         printf("Missing return statement\n");
-        exit(1);
+        free(s);
+        return NULL;
     }
 
     // Get expression
-    s->exp = parseExpression();
+    expression *e = parseExpression();
+    if (e == NULL)
+    {
+        free(s);
+        return NULL;
+    }
+    s->exp = e;
 
     //Check for a semicolon
     tok = nextToken();
     if (tok == NULL || tok->type != SEMICOLON)
     {
         printf("Missing Semicolon\n");
-        exit(1);
+        free(s);
+        return NULL;    
     }
     return s;
 }
@@ -98,13 +143,19 @@ statement *parseStatement()
 expression *parseExpression()
 {
     expression *e = malloc(sizeof(expression));
+    if (e == NULL)
+    {
+        printf("Memory allocation failed\n");
+        return NULL;
+    }
 
     // Check for int value
     token *tok = nextToken();
     if (tok == NULL || tok->type != INT)
     {
         printf("Missing expression\n");
-        exit(1);
+        free(e);
+        return NULL;
     }
     e->value = tok->value;
     return e;
