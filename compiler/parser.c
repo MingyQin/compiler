@@ -43,7 +43,7 @@ function *parseFunc()
         free(f);
         return NULL;
     }
-
+    
     // Look for and set function ID
     tok = nextToken();
     if (tok == NULL || tok->type != IDENTIFIER)
@@ -102,6 +102,7 @@ function *parseFunc()
     return f;
 }
 
+// Returns null if something went wrong
 statement *parseStatement()
 {
     statement *s = malloc(sizeof(statement));

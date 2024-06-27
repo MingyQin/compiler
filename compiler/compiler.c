@@ -50,11 +50,11 @@ int main(int argc, char *argv[])
 
     //printf("\n");
     // Print tokens
-    for (int i = 0; i < num_tokens; i++)
+    /*for (int i = 0; i < num_tokens; i++)
     {
         printf("[%d, \"%s\", %d], ", tokens[i].type, tokens[i].lexeme, tokens[i].value);
     }
-    printf("\n");
+    printf("\n");*/
 
 
     // Parse the tokens into an AST
@@ -63,11 +63,13 @@ int main(int argc, char *argv[])
     program *ast = parseProgram();
     if (ast == NULL)
     {
-        printf("Couldn't create ast");
+        printf("Couldn't create AST\n");
         freeTokens(tokens, num_tokens);
         fclose(file);
         return 1;
     }
+
+    
 
 
     // Free the tokens 
