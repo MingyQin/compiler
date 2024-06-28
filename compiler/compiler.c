@@ -9,6 +9,11 @@
 #include "parser.h"
 #include "tokens.h"
 
+void writeFunction(FILE* outFile, function *f);
+void writeStatement(FILE *outFile, statement *s);
+void writeExpression(FILE *outFile, expression *e);
+
+
 
 
 // Used for getting the next token in the nextToken() function
@@ -69,8 +74,13 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    
+    // Code generation
 
+    // Open new file
+    FILE *outFile = fopen("result.s", "w");
+    
+    // Traverse the AST
+    writeFunction(outFile, ast->func);
 
     // Free the tokens 
     freeTokens(tokens, num_tokens);
@@ -78,11 +88,32 @@ int main(int argc, char *argv[])
     // Free the AST
     freeProgram(ast);
 
-    printf("\n");
-
     fclose(file);
+    fclose(outFile);
     return 0;
 }
+
+// Write a function in assembly
+void writeFunction(FILE *outFile, function *f)
+{
+    char *funcName = f->id;
+    fprintf(outFile, ".text\n.globl %s\n\t%s:\n", funcName, funcName);
+    writeStatement(outFile, f->statement);
+}
+
+// Write a basic return statement
+void writeStatement(FILE *outFile, statement *s)
+{
+    writeExpression(outFile, s->exp);
+    fprintf(outFile, "\tret");
+}
+
+// Write an integer expression
+void writeExpression(FILE *outFile, expression *e)
+{
+    fprintf(outFile, "\tmovl $%d, %%eax", e->value);
+}
+
 
 // Free all tokens and the elements contained inside the struct
 void freeTokens(token *tokens, int num_tokens)

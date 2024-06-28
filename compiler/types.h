@@ -21,6 +21,11 @@ typedef struct {
     int value;
 } token;
 
+// Function types
+typedef enum {
+    RETURN_FUNC
+} EXP_TYPE;
+
 // Structs for the AST
 
 typedef struct {
