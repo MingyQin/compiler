@@ -87,6 +87,7 @@ void addLiteralToken(token *tokens, int index, char *lexeme, int lexemeLen)
         puts("Memory allocation failed");
         exit(1);
     }
+    // Copy the lexeme string into token struct
     strncpy(tokens[index].lexeme, lexeme, lexemeLen);
 
     //Asasign the value

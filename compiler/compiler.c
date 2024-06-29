@@ -76,14 +76,40 @@ int main(int argc, char *argv[])
 
     // Code generation
 
+    // Create a pointer to the filename (program.c --> program)
+    // Copy the program name to a new string leaving out the last two characters
+    char *outFileName = argv[1];
+
+    // Replace the last two characters with ".s"
+    outFileName[strlen(outFileName)-2] = '.';
+    outFileName[strlen(outFileName)-1] = 's';
+    /*if (outFileName == NULL)
+    {
+        printf("Memory allocation failed\n");
+        return 1;
+    }*/
+    //strncpy(outFileName, argv[1], strlen(argv[1])-2);
+
+    printf("%s\n", outFileName);
+
     // Open new file
-    FILE *outFile = fopen("result.s", "w");
+    FILE *outFile = fopen(outFileName, "w");
+    if (outFile== NULL)
+    {
+        printf("Couldn't open outfile\n");
+        return 1;
+    }
+
     
     // Traverse the AST
     writeFunction(outFile, ast->func);
 
+    // Ensure the file ends with a newline
+    fprintf(outFile, "\n");
+
     // Free the tokens 
     freeTokens(tokens, num_tokens);
+    //free(outFileName);
 
     // Free the AST
     freeProgram(ast);
@@ -97,7 +123,7 @@ int main(int argc, char *argv[])
 void writeFunction(FILE *outFile, function *f)
 {
     char *funcName = f->id;
-    fprintf(outFile, ".text\n.globl %s\n\t%s:\n", funcName, funcName);
+    fprintf(outFile, ".text\n.globl %s\n\n%s:\n", funcName, funcName);
     writeStatement(outFile, f->statement);
 }
 
@@ -111,7 +137,7 @@ void writeStatement(FILE *outFile, statement *s)
 // Write an integer expression
 void writeExpression(FILE *outFile, expression *e)
 {
-    fprintf(outFile, "\tmovl $%d, %%eax", e->value);
+    fprintf(outFile, "\tmovl $%d, %%eax\n", e->value);
 }
 
 
