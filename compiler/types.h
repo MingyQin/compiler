@@ -1,6 +1,7 @@
 #ifndef TYPES_H
 #define TYPES_H
 
+
 typedef enum {
     // Keywords
     RETURN, KEYWORD_INT, 
@@ -20,6 +21,13 @@ typedef struct {
     char *lexeme;
     int value;
 } token;
+
+typedef struct {
+    token *list;
+    int numTokens;
+    int maxSize;
+    int nextToken;
+} token_list;
 
 // Function types
 typedef enum {

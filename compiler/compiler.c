@@ -8,18 +8,10 @@
 #include "lexer.h"
 #include "parser.h"
 #include "tokens.h"
-
-void writeFunction(FILE* outFile, function *f);
-void writeStatement(FILE *outFile, statement *s);
-void writeExpression(FILE *outFile, expression *e);
-
-
-
+#include "codegen.h"
 
 // Used for getting the next token in the nextToken() function
-static int token_index = -1;
-static int num_tokens = 0;
-static token *tokens;
+static token_list *tokens;
 
 int main(int argc, char *argv[])
 {
@@ -42,15 +34,15 @@ int main(int argc, char *argv[])
 
     // Create token list
     // MAX TOKENS IS 100 (Could cause errors later)
-    tokens = malloc(sizeof(token) * 100);
+    
+    
+
+    tokens = lexFile(file);
     if (tokens == NULL)
     {
-        puts("Memory allocation failed");
+        puts("Failed to create token list\n");
         return 1;
     }
-
-    num_tokens = lexFile(file, tokens);
-
    
 
     //printf("\n");
@@ -69,7 +61,7 @@ int main(int argc, char *argv[])
     if (ast == NULL)
     {
         printf("Couldn't create AST\n");
-        freeTokens(tokens, num_tokens);
+        freeTokens(tokens);
         fclose(file);
         return 1;
     }
@@ -83,12 +75,6 @@ int main(int argc, char *argv[])
     // Replace the last two characters with ".s"
     outFileName[strlen(outFileName)-2] = '.';
     outFileName[strlen(outFileName)-1] = 's';
-    /*if (outFileName == NULL)
-    {
-        printf("Memory allocation failed\n");
-        return 1;
-    }*/
-    //strncpy(outFileName, argv[1], strlen(argv[1])-2);
 
     printf("%s\n", outFileName);
 
@@ -108,7 +94,7 @@ int main(int argc, char *argv[])
     fprintf(outFile, "\n");
 
     // Free the tokens 
-    freeTokens(tokens, num_tokens);
+    freeTokens(tokens);
     //free(outFileName);
 
     // Free the AST
@@ -119,36 +105,14 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-// Write a function in assembly
-void writeFunction(FILE *outFile, function *f)
-{
-    char *funcName = f->id;
-    fprintf(outFile, ".text\n.globl %s\n\n%s:\n", funcName, funcName);
-    writeStatement(outFile, f->statement);
-}
-
-// Write a basic return statement
-void writeStatement(FILE *outFile, statement *s)
-{
-    writeExpression(outFile, s->exp);
-    fprintf(outFile, "\tret");
-}
-
-// Write an integer expression
-void writeExpression(FILE *outFile, expression *e)
-{
-    fprintf(outFile, "\tmovl $%d, %%eax\n", e->value);
-}
-
-
 // Free all tokens and the elements contained inside the struct
-void freeTokens(token *tokens, int num_tokens)
+void freeTokens(token_list *tokens)
 {
-    for (int i = 0; i < num_tokens; i++)
+    for (int i = 0; i < tokens->numTokens; i++)
     {
-        free(tokens[i].lexeme);
+        free(tokens->list[i].lexeme);
     }
-
+    free(tokens->list);
     free (tokens);
 }
 
@@ -156,10 +120,10 @@ void freeTokens(token *tokens, int num_tokens)
 // Returns NULL if there is no next token
 token *nextToken()
 {
-    token_index++;
-    if (token_index > num_tokens)
+    tokens->nextToken++;
+    if (tokens->nextToken >= tokens->numTokens)
     {
         return NULL;
     }
-    return &tokens[token_index];
+    return &tokens->list[tokens->nextToken];
 }

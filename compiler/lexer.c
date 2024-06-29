@@ -149,12 +149,26 @@ void addPunctuationToken(token *tokens, int index, char *lexeme)
 // Returns the amount of tokens created
 // The last index with a token in it is return-1
 // Lexes through the file adding tokens to the list
-int lexFile(FILE *file, token *tokens)
+token_list *lexFile(FILE *file)
 {
+    token_list *tokenList = malloc(sizeof(token_list));
+    if (tokenList == NULL)
+    {
+        printf("Memory allocation failed\n");
+        return NULL;
+    }
+
+    tokenList->maxSize = 100;
+
+    // Temporary pointer for creating the token list
+    token *tokens = malloc(sizeof(token) * tokenList->maxSize);
+    
+
     regex_t reegex;
     if (regcomp(&reegex, "[{}();]", 0) != 0)
     {
         puts("Regex compilation failed");
+        return NULL;
     }
 
     int index = 0;
@@ -164,7 +178,7 @@ int lexFile(FILE *file, token *tokens)
     if (buffer == NULL)
     {
         puts("Memory allocation failed");
-        exit(1);
+        return NULL;
     }
 
     // Read initial character
@@ -214,12 +228,30 @@ int lexFile(FILE *file, token *tokens)
             c = fgetc(file);
         }
         // printf("%s", buffer); Check to see if it is reading through each character of the file
+
+        // Check if the next token will be out of range
+        if (index >= tokenList->maxSize)
+        {
+            tokenList->maxSize += 100;
+            tokens = realloc(tokens, sizeof(token) * tokenList->maxSize);
+            if (tokens == NULL)
+            {
+                printf("Couldn't reallocate memory\n");
+                return NULL;
+            }
+        }
     }
 
+    
     // Free buffer and regex
     regfree(&reegex);
     free(buffer);
 
+    // Set the rest of the tokenList attributes
+    tokenList->list = tokens;
+    tokenList->numTokens = index;
+    tokenList->nextToken = -1;
+
     // Return the number of 
-    return index;
+    return tokenList;
 }

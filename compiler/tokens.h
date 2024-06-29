@@ -3,7 +3,7 @@
 
 #include "types.h"
 
-void freeTokens(token *tokens, int n);
+void freeTokens(token_list *tokens);
 token *nextToken();
 
 #endif
