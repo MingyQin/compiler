@@ -2,5 +2,5 @@
 .globl main
 
 main:
-	movl $2, %eax
+	movl $0, %eax
 	ret
