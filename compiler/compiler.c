@@ -31,10 +31,6 @@ int main(int argc, char *argv[])
         return 1;
     }
     
-
-    // Create token list
-    // MAX TOKENS IS 100 (Could cause errors later)
-    
     
 
     tokens = lexFile(file);
@@ -47,11 +43,11 @@ int main(int argc, char *argv[])
 
     //printf("\n");
     // Print tokens
-    /*for (int i = 0; i < num_tokens; i++)
+    for (int i = 0; i < tokens->numTokens; i++)
     {
-        printf("[%d, \"%s\", %d], ", tokens[i].type, tokens[i].lexeme, tokens[i].value);
+        printf("[%d, \"%s\", %d], ", tokens->list[i].type, tokens->list[i].lexeme, tokens->list[i].value);
     }
-    printf("\n");*/
+    printf("\n");
 
 
     // Parse the tokens into an AST

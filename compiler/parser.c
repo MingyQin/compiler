@@ -150,7 +150,7 @@ expression *parseExpression()
         return NULL;
     }
 
-    // Check for int value
+    // Check for int value or unary operator
     token *tok = nextToken();
     if (tok == NULL || tok->type != INT)
     {

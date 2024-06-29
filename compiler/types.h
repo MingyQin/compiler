@@ -9,6 +9,9 @@ typedef enum {
     // Identifier
     IDENTIFIER,
 
+    // Unary ops
+    NEGATION, BITWISE_COMP, LOGICAL_NEG,
+
     // Datatypes
     INT,
 
@@ -29,16 +32,15 @@ typedef struct {
     int nextToken;
 } token_list;
 
-// Function types
-typedef enum {
-    RETURN_FUNC
-} EXP_TYPE;
 
 // Structs for the AST
-
 typedef struct {
     int value;
 } expression;
+
+typedef struct {
+    expression *innerExp;
+} unaryOp;
 
 typedef struct {
     expression *exp;
