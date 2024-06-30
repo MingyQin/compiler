@@ -2,7 +2,7 @@
 #define TYPES_H
 
 
-typedef enum {
+/*typedef enum {
     // Keywords
     RETURN, KEYWORD_INT, 
     
@@ -17,13 +17,29 @@ typedef enum {
 
     // Single-character (punctuation)
     OPEN_BRACE, CLOSED_BRACE, OPEN_PAR, CLOSED_PAR, SEMICOLON
-} TOKEN_TYPE;
+} TOKEN_TYPE;*/
 
 typedef struct {
-    TOKEN_TYPE type;
+    enum {
+    // Keywords
+    RETURN, KEYWORD_INT, 
+    
+    // Identifier
+    IDENTIFIER,
+
+    // Unary ops
+    NEGATION, BITWISE_COMP, LOGICAL_NEG,
+
+    // Datatypes
+    INT,
+
+    // Single-character (punctuation)
+    OPEN_BRACE, CLOSED_BRACE, OPEN_PAR, CLOSED_PAR, SEMICOLON
+    } type;
     char *lexeme;
     int value;
 } token;
+
 
 typedef struct {
     token *list;
@@ -34,13 +50,21 @@ typedef struct {
 
 
 // Structs for the AST
-typedef struct {
-    int value;
-} expression;
+
+struct expression;
 
 typedef struct {
-    expression *innerExp;
+    char type;
+    struct expression *innerExp;
 } unaryOp;
+
+typedef struct expression {
+    enum {CONST, UNARY_OP} type;
+    int value;
+    unaryOp *unOp;
+} expression;
+
+
 
 typedef struct {
     expression *exp;

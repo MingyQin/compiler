@@ -152,14 +152,64 @@ expression *parseExpression()
 
     // Check for int value or unary operator
     token *tok = nextToken();
-    if (tok == NULL || tok->type != INT)
+    if (tok == NULL)
     {
         printf("Missing expression\n");
         free(e);
         return NULL;
     }
-    e->value = tok->value;
+    else if (tok->type == INT) // Const INT
+    {
+        e->type = CONST;
+        e->value = tok->value;
+        e->unOp = NULL;
+    }
+    else if (tok->type == NEGATION || tok->type == BITWISE_COMP || tok->type == LOGICAL_NEG) //UnaryOp
+    {
+        e->type = UNARY_OP;
+        int value = -1;
+        // Parse for the unarOp
+        e->unOp = parseUnaryOp(tok);
+        if (e->unOp == NULL)
+        {
+            printf("Error parsing unaryOp\n");
+            free(e);
+            return NULL;
+        }
+    }
+    else 
+    {
+        printf("Missing expression\n");
+        free(e);
+        return NULL; 
+    }
     return e;
+}
+
+unaryOp *parseUnaryOp(token *tok)
+{
+    unaryOp *u = malloc(sizeof(unaryOp));
+    if (u == NULL)
+    {
+        free(u);
+        printf("Memory allocation failed\n");
+        return NULL;
+    }
+    // Set the type to the first character of the lexeme
+    // First character should be the operation while the 2nd character is \0
+    u->type = tok->lexeme[0];
+
+    // Recursively parse to check for another unaryOp or const expression
+    // Recursion should end when a const expression is met or all the tokens are consumed
+    u->innerExp = parseExpression();
+    if (u->innerExp == NULL)
+    {
+        printf("Error parsing unaryOp\n");
+        free(u);
+        return NULL;
+    }
+
+    return u;
 }
 
 void freeProgram(program *p)
@@ -185,5 +235,17 @@ void freeStatement(statement *s)
 
 void freeExpression(expression *e)
 {
+    // If it is a UNARY_OP then free the unaryOp first
+    if (e->type == UNARY_OP)
+    {
+        freeUnaryOp(e->unOp);
+    }
     free(e);
+}
+
+void freeUnaryOp(unaryOp *unOp)
+{
+    // Free the inner expressions
+    freeExpression(unOp->innerExp);
+    free(unOp);
 }
