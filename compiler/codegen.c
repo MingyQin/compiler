@@ -21,5 +21,36 @@ void writeStatement(FILE *outFile, statement *s)
 // Write an integer expression
 void writeExpression(FILE *outFile, expression *e)
 {
-    fprintf(outFile, "\tmovl $%d, %%eax\n", e->value);
+    if (e->type == CONST)
+    {
+        fprintf(outFile, "\tmov $%d, %%rax\n", e->value);
+    }
+    else if (e->type == UNARY_OP)
+    {
+        writeUnaryOp(outFile, e->unOp);
+    }
+}
+
+void writeUnaryOp(FILE *outFile, unaryOp *u)
+{
+    writeExpression(outFile, u->innerExp);
+    switch (u->type)
+    {
+        case '-':
+            fprintf(outFile, "\tneg %%rax\n");
+            break;
+        case '~':
+            fprintf(outFile, "\tnot %%rax\n");
+            break;
+        case '!':
+            fprintf(outFile, "\tcmp $0 %%rax\n");
+            fprintf(outFile, "\tmov $0 %%rax\n");
+            fprintf(outFile, "\tsete %%al\n");
+            break;
+    }
+}
+
+void writeProgram(FILE *outFile, program *p)
+{
+    writeFunction(outFile, p->func);
 }

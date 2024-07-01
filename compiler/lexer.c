@@ -198,7 +198,7 @@ token_list *lexFile(FILE *file)
     }
 
     regex_t unaryOp;
-    if (regcomp(&unaryOp, "[-~\?]", 0) != 0)
+    if (regcomp(&unaryOp, "[-~!]", 0) != 0)
     {
         puts("Regex compilation failed");
         return NULL;

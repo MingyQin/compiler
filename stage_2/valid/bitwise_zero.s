@@ -2,5 +2,6 @@
 .globl main
 
 main:
-	movl $0, %eax
+	mov $0, %rax
+	not %rax
 	ret

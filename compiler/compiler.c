@@ -9,6 +9,7 @@
 #include "parser.h"
 #include "tokens.h"
 #include "codegen.h"
+#include "pprint.h"
 
 // Used for getting the next token in the nextToken() function
 static token_list *tokens;
@@ -61,6 +62,9 @@ int main(int argc, char *argv[])
         fclose(file);
         return 1;
     }
+
+    // Prettyprint the AST
+    printProgram(ast);
 
     // Code generation
 

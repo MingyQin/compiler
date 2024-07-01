@@ -135,7 +135,8 @@ statement *parseStatement()
     if (tok == NULL || tok->type != SEMICOLON)
     {
         printf("Missing Semicolon\n");
-        free(s);
+        // Free the statement and any nested unOps
+        freeStatement(s);
         return NULL;    
     }
     return s;
