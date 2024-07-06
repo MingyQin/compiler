@@ -27,8 +27,14 @@ typedef struct {
     // Identifier
     IDENTIFIER,
 
+    // Can be subtraction or negation
+    MINUS,
+
     // Unary ops
-    NEGATION, BITWISE_COMP, LOGICAL_NEG,
+    BITWISE_COMP, LOGICAL_NEG,
+
+    // Math
+    MULTIPLY, ADD, DIVISION,
 
     // Datatypes
     INT,

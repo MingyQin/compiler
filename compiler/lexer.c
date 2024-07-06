@@ -115,10 +115,9 @@ void addIntegerToken(token *tokens, int index, char *lexeme, int lexemeLen)
 // WARNING !!!!
 // WORKS ONLY IF THE LEXEME IS ONE CHARACTER AND THEN A NULL TERMINATOR
 // ONLY FOR LEXEME WITH LENGTH OF 2
-void addPunctuationToken(token *tokens, int index, char *lexeme)
+void addSingleCharacterToken(token *tokens, int index, char *lexeme)
 {
-    char punctuation = lexeme[0];
-    switch (punctuation)
+    switch (lexeme[0])
     {
         case '{':
             tokens[index].type = OPEN_BRACE;
@@ -134,6 +133,15 @@ void addPunctuationToken(token *tokens, int index, char *lexeme)
             break;
         case ';':
             tokens[index].type = SEMICOLON;
+            break;
+        case '-':
+            tokens[index].type = MINUS;
+            break;
+        case '~':
+            tokens[index].type = BITWISE_COMP;
+            break;
+        case '!':
+            tokens[index].type = LOGICAL_NEG;
             break;
     }
     tokens[index].lexeme = malloc(sizeof(char) * (2));
@@ -152,7 +160,7 @@ void addUnaryOpToken(token *tokens, int index, char *lexeme)
     switch(unaryOp)
     {
         case '-':
-            tokens[index].type = NEGATION;
+            tokens[index].type = MINUS;
             break;
         case '~':
             tokens[index].type = BITWISE_COMP;
@@ -190,15 +198,8 @@ token_list *lexFile(FILE *file)
     token *tokens = malloc(sizeof(token) * tokenList->maxSize);
     
 
-    regex_t punctuation;
-    if (regcomp(&punctuation, "[{}();]", 0) != 0)
-    {
-        puts("Regex compilation failed");
-        return NULL;
-    }
-
-    regex_t unaryOp;
-    if (regcomp(&unaryOp, "[-~!]", 0) != 0)
+    regex_t singleCharToken;
+    if (regcomp(&singleCharToken, "[{}();~!-]", 0) != 0)
     {
         puts("Regex compilation failed");
         return NULL;
@@ -252,14 +253,9 @@ token_list *lexFile(FILE *file)
             buffer[0] = c;
             buffer[1] = '\0';
             // Add token if it matches punctuation
-            if (regexec(&punctuation, buffer, 0, NULL, 0) == 0)
+            if (regexec(&singleCharToken, buffer, 0, NULL, 0) == 0)
             {
-                addPunctuationToken(tokens, index, buffer);
-                index++;
-            }
-            else if (regexec(&unaryOp, buffer, 0, NULL, 0) == 0)
-            {
-                addUnaryOpToken(tokens, index, buffer);
+                addSingleCharacterToken(tokens, index, buffer);
                 index++;
             }
 
@@ -283,8 +279,7 @@ token_list *lexFile(FILE *file)
 
     
     // Free buffer and regex
-    regfree(&punctuation);
-    regfree(&unaryOp);
+    regfree(&singleCharToken);
     free(buffer);
 
     // Set the rest of the tokenList attributes

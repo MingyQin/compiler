@@ -165,7 +165,7 @@ expression *parseExpression()
         e->value = tok->value;
         e->unOp = NULL;
     }
-    else if (tok->type == NEGATION || tok->type == BITWISE_COMP || tok->type == LOGICAL_NEG) //UnaryOp
+    else if (tok->type == MINUS || tok->type == BITWISE_COMP || tok->type == LOGICAL_NEG) //UnaryOp
     {
         e->type = UNARY_OP;
         int value = -1;
