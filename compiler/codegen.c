@@ -18,12 +18,13 @@ void writeStatement(FILE *outFile, statement *s)
     fprintf(outFile, "\tret");
 }
 
-// Write an integer expression
+// Write an integer or unaryOp expression
 void writeExpression(FILE *outFile, expression *e)
 {
     if (e->type == CONST)
     {
-        fprintf(outFile, "\tmov $%d, %%rax\n", e->value);
+        // Move a 32-bit integer into the RAX register
+        fprintf(outFile, "\tmovl $%d, %%eax\n", e->value);
     }
     else if (e->type == UNARY_OP)
     {
@@ -43,8 +44,12 @@ void writeUnaryOp(FILE *outFile, unaryOp *u)
             fprintf(outFile, "\tnot %%rax\n");
             break;
         case '!':
-            fprintf(outFile, "\tcmp $0 %%rax\n");
-            fprintf(outFile, "\tmov $0 %%rax\n");
+            // Compare the INT in EAX to 0
+            fprintf(outFile, "\tcmp $0, %%rax\n");
+            // Zero out all 64 bits of the register (32 bit operations extend to zero out the rest of the register)
+            // Zeros the registers without affecting the ZF
+            fprintf(outFile, "\tmov $0, %%eax\n");
+            // Set the lowest 2 bits of RAX to the result of the comparison
             fprintf(outFile, "\tsete %%al\n");
             break;
     }
