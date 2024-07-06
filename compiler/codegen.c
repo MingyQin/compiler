@@ -35,7 +35,7 @@ void writeExpression(FILE *outFile, expression *e)
 void writeUnaryOp(FILE *outFile, unaryOp *u)
 {
     writeExpression(outFile, u->innerExp);
-    switch (u->type)
+    switch (u->operator)
     {
         case '-':
             fprintf(outFile, "\tneg %%rax\n");

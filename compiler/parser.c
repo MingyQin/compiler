@@ -198,7 +198,7 @@ unaryOp *parseUnaryOp(token *tok)
     }
     // Set the type to the first character of the lexeme
     // First character should be the operation while the 2nd character is \0
-    u->type = tok->lexeme[0];
+    u->operator = tok->lexeme[0];
 
     // Recursively parse to check for another unaryOp or const expression
     // Recursion should end when a const expression is met or all the tokens are consumed

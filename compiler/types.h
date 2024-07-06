@@ -34,7 +34,7 @@ typedef struct {
     BITWISE_COMP, LOGICAL_NEG,
 
     // Math
-    MULTIPLY, ADD, DIVISION,
+    MULTIPLY, ADD, DIVIDE,
 
     // Datatypes
     INT,
@@ -60,16 +60,22 @@ typedef struct {
 struct expression;
 
 typedef struct {
-    char type;
+    char operator;
     struct expression *innerExp;
 } unaryOp;
 
+typedef struct {
+    char operator;
+    struct expression *expL;
+    struct expression *expR;
+} binaryOp;
+
 typedef struct expression {
-    enum {CONST, UNARY_OP} type;
+    enum {CONST, UNARY_OP, BINARY_OP} type;
     int value;
     unaryOp *unOp;
+    binaryOp *binUp;
 } expression;
-
 
 
 typedef struct {

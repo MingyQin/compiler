@@ -4,7 +4,7 @@
 
 void printUnaryOp(unaryOp *u)
 {
-    printf("UNARY_OP<%c> ", u->type);
+    printf("UNARY_OP<%c> ", u->operator);
     if (u->innerExp != NULL)
     {
         printExpression(u->innerExp);

@@ -143,30 +143,14 @@ void addSingleCharacterToken(token *tokens, int index, char *lexeme)
         case '!':
             tokens[index].type = LOGICAL_NEG;
             break;
-    }
-    tokens[index].lexeme = malloc(sizeof(char) * (2));
-    if (tokens[index].lexeme == NULL)
-    {
-        puts("Memory allocation failed");
-        exit(1);
-    }
-    strncpy(tokens[index].lexeme, lexeme, 2);
-    tokens[index].value = -1;
-}
-
-void addUnaryOpToken(token *tokens, int index, char *lexeme)
-{
-    char unaryOp = lexeme[0];
-    switch(unaryOp)
-    {
-        case '-':
-            tokens[index].type = MINUS;
+        case '+':
+            tokens[index].type = ADD;
             break;
-        case '~':
-            tokens[index].type = BITWISE_COMP;
+        case '*':
+            tokens[index].type = MULTIPLY;
             break;
-        case '!':
-            tokens[index].type = LOGICAL_NEG;
+        case '/':
+            tokens[index].type = DIVIDE;
             break;
     }
     tokens[index].lexeme = malloc(sizeof(char) * (2));
@@ -178,7 +162,6 @@ void addUnaryOpToken(token *tokens, int index, char *lexeme)
     strncpy(tokens[index].lexeme, lexeme, 2);
     tokens[index].value = -1;
 }
-
 
 // Returns the amount of tokens created
 // The last index with a token in it is return-1
@@ -199,7 +182,8 @@ token_list *lexFile(FILE *file)
     
 
     regex_t singleCharToken;
-    if (regcomp(&singleCharToken, "[{}();~!-]", 0) != 0)
+    // Make sure the minus sign is at the end because it has special effects when surrounded by characters
+    if (regcomp(&singleCharToken, "[{}();~!+/-]", 0) != 0)
     {
         puts("Regex compilation failed");
         return NULL;
