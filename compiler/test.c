@@ -40,7 +40,6 @@ void printUnaryOp(unaryOp *u);
 
 int main(int argc, char *argv[])
 {    
-    printf("Hello\n");
      // Ensure there are enough arguments
     if (argc != 2)
     {
@@ -75,6 +74,13 @@ int main(int argc, char *argv[])
     // Create shitty AST
     // Start with the lowest precedence level
     expression *tree = parseExpression(0);
+    if (tree == NULL)
+    {
+        printf("Couldn't create tree\n");
+        fclose(file);
+        freeTokens(tokens);
+        return 1;
+    }
 
     printTree(tree);
     printf("\n");
@@ -83,6 +89,7 @@ int main(int argc, char *argv[])
     freeTokens(tokens);
 
     fclose(file);
+    return 0;
 }
 
 // bp = binding power
@@ -91,6 +98,11 @@ expression *parseExpression(int bp)
     //create new expression
     // nud
     expression *e = parseInitial();
+    if (e == NULL)
+    {
+        printf("Error parsing initial exp\n");
+        return NULL;
+    }
 
     token *next = peekToken();
     if (next == NULL)
@@ -100,11 +112,18 @@ expression *parseExpression(int bp)
 
     token *current;
 
+    // Keep trying to create a new expression with e as the leftExp as long as the operator precedence is greater
     while (getOperatorPrecedence(next) > bp)
     {
         current = nextToken();
         e = parseLeftDenotation(e, current);
+        if (e == NULL)
+        {
+            printf("Couldn't parse led\n");
+            return NULL;
+        }
         next = peekToken();
+        // If there is no next token
         if (next == NULL)
         {
             return e;
@@ -129,8 +148,15 @@ expression *parseLeftDenotation(expression *left, token *operatorToken)
     
     // Parse the right side expression with supplying the operatorPrecedence
     int precedence = getOperatorPrecedence(operatorToken);
-
     e->expR = parseExpression(precedence);
+    if (e->expR == NULL)
+    {
+        printf("Error parsing expression\n");
+        // The left part of the tree is already built fully so every element of it needs to be freed
+        freeTree(e->expL);
+        free(e);
+        return NULL;
+    }
 
     return e;
 }
@@ -178,6 +204,7 @@ expression *parseInitial()
     }
     else 
     {
+        free(e);
         printf("Missing expression\n");
         return NULL; 
     }
