@@ -127,3 +127,14 @@ token *nextToken()
     }
     return &tokens->list[tokens->nextToken];
 }
+
+// Returns a pointer to the next token from the list without incrementing nextToken
+// Returns NULL if there is no next token
+token *peekToken()
+{
+    if (tokens->nextToken+1 >= tokens->numTokens)
+    {
+        return NULL;
+    }
+    return &tokens->list[tokens->nextToken+1];
+}

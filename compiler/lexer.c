@@ -183,7 +183,7 @@ token_list *lexFile(FILE *file)
 
     regex_t singleCharToken;
     // Make sure the minus sign is at the end because it has special effects when surrounded by characters
-    if (regcomp(&singleCharToken, "[{}();~!+/-]", 0) != 0)
+    if (regcomp(&singleCharToken, "[{}();~!+*/-]", 0) != 0)
     {
         puts("Regex compilation failed");
         return NULL;

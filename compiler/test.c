@@ -13,10 +13,11 @@ struct expression;
 
 typedef struct expression {
     enum {
-        BINARY_OP, INTEGER
+        BINARY_OP, INTEGER, UNARY_OP
     } type;
     char operator;
     int value;
+    
     struct expression *expL;
     struct expression *expR; 
 } expression;
