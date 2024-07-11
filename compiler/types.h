@@ -70,15 +70,21 @@ typedef struct {
     struct expression *innerExp;
 } unaryOp;
  
-// List of terms being + or -
-/*typedef struct expression {
-    term *term;
-    binaryOp *binOp;
-} expression;*/
+typedef struct expression {
+    enum {
+        BINARY_OP, INTEGER, UNARY_OP
+    } type;
+    char operator;
+    int value;
+    unaryOp *unOp;
+    struct expression *expL;
+    struct expression *expR; 
+} expression;
+
 
 
 typedef struct {
-    //expression *exp;
+    expression *exp;
 } statement;
 
 typedef struct {

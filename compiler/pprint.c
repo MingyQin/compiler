@@ -13,21 +13,29 @@ void printUnaryOp(unaryOp *u)
 
 void printExpression(expression *e)
 {
-    if (e->type == CONST)
+    if (e->type == BINARY_OP)
     {
-        printf("INT<%d>\n", e->value);
+        printf("(");
+        printExpression(e->expL);
+        printf(" %c ", e->operator);
+        printExpression(e->expR);
+        printf(")");
     }
-    else if (e->type == UNARY_OP && e->unOp != NULL)
+    else if (e->type == UNARY_OP)
     {
         printUnaryOp(e->unOp);
     }
+    else if (e->type == INTEGER)
+    {
+        printf("%d", e->value);
+    }
 }
-
 // All statements are return statements for now
 void printStatement(statement *s)
 {
     printf("\tRETURN ");
     printExpression(s->exp);
+    printf("\n");
 }
 
 void printFunction(function *f)

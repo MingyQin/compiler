@@ -6,13 +6,16 @@
 program *parseProgram();
 function *parseFunc();
 statement *parseStatement();
-expression *parseExpression();
+expression *parseInitial();
+expression *parseLeftDenotation(expression *left, token *operatorToken);
+expression *parseExpression(int bp);
 unaryOp *parseUnaryOp(token *tok);
+int getOperatorPrecedence(token *tok);
 void freeProgram(program *p);
 void freeFunc(function *f);
 void freeStatement(statement *s);
 void freeExpression(expression *e);
-void freeUnaryOp(unaryOp *unOp);
+void freeUnaryOp(unaryOp *u);
 
 
 

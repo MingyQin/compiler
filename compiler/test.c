@@ -9,13 +9,7 @@
 // Experimental pratt parser
 struct expression;
 
-
-/*typedef struct {
-    char operator;
-    struct expression *innerExp;
-} unaryOp;*/
-
-typedef struct expression {
+/*typedef struct expression {
     enum {
         BINARY_OP, INTEGER, UNARY_OP
     } type;
@@ -24,15 +18,15 @@ typedef struct expression {
     unaryOp *unOp;
     struct expression *expL;
     struct expression *expR; 
-} expression;
+} expression;*/
 
 static token_list *tokens;
 
 expression *parseInitial();
 expression *parseLeftDenotation(expression *left, token *operatorToken);
 expression *parseExpression(int bp);
-void printTree(expression *e);
-void freeTree(expression *e);
+void printExpression(expression *e);
+void freeExpression(expression *e);
 int getOperatorPrecedence(token *tok);
 unaryOp *parseUnaryOp(token *tok);
 void freeUnary(unaryOp *u);
@@ -82,10 +76,10 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    printTree(tree);
+    printExpression(tree);
     printf("\n");
 
-    freeTree(tree);
+    freeExpression(tree);
     freeTokens(tokens);
 
     fclose(file);
@@ -153,7 +147,7 @@ expression *parseLeftDenotation(expression *left, token *operatorToken)
     {
         printf("Error parsing expression\n");
         // The left part of the tree is already built fully so every element of it needs to be freed
-        freeTree(e->expL);
+        freeExpression(e->expL);
         free(e);
         return NULL;
     }
@@ -239,14 +233,14 @@ unaryOp *parseUnaryOp(token *tok)
 }
 
 
-void printTree(expression *e)
+void printExpression(expression *e)
 {
     if (e->type == BINARY_OP)
     {
         printf("(");
-        printTree(e->expL);
+        printExpression(e->expL);
         printf(" %c ", e->operator);
-        printTree(e->expR);
+        printExpression(e->expR);
         printf(")");
     }
     else if (e->type == UNARY_OP)
@@ -263,17 +257,17 @@ void printUnaryOp(unaryOp *u)
 {
     printf("(");
     printf("%c", u->operator);
-    printTree(u->innerExp);
+    printExpression(u->innerExp);
     printf(")");
 }
 
 // Free tree of expressions
-void freeTree(expression *e)
+void freeExpression(expression *e)
 {
     if (e->type == BINARY_OP)
     {
-        freeTree(e->expL);
-        freeTree(e->expR);
+        freeExpression(e->expL);
+        freeExpression(e->expR);
     }
     else if (e->type == UNARY_OP)
     {
@@ -284,7 +278,7 @@ void freeTree(expression *e)
 
 void freeUnary(unaryOp *u)
 {
-    freeTree(u->innerExp);
+    freeExpression(u->innerExp);
     free(u);
 }
 
@@ -297,16 +291,12 @@ int getOperatorPrecedence(token *tok)
     {
         case ADD:
             return 1;
-            break;
         case MINUS:
             return 1;
-            break;
         case MULTIPLY:
             return 2;
-            break;
         case DIVIDE:
             return 2;
-            break;
     }
     return -1;
 }

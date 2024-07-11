@@ -21,7 +21,7 @@ void writeStatement(FILE *outFile, statement *s)
 // Write an integer or unaryOp expression
 void writeExpression(FILE *outFile, expression *e)
 {
-    if (e->type == CONST)
+    if (e->type == INTEGER)
     {
         // Move a 32-bit integer into the RAX register
         fprintf(outFile, "\tmovl $%d, %%eax\n", e->value);

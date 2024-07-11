@@ -122,7 +122,8 @@ statement *parseStatement()
     }
 
     // Get expression
-    expression *e = parseExpression();
+    // Start with the lowest precedence level
+    expression *e = parseExpression(0);
     if (e == NULL)
     {
         free(s);
@@ -142,7 +143,48 @@ statement *parseStatement()
     return s;
 }
 
-expression *parseExpression()
+// bp = binding power
+expression *parseExpression(int bp)
+{
+    //create new expression
+    // nud
+    expression *e = parseInitial();
+    if (e == NULL)
+    {
+        printf("Error parsing initial exp\n");
+        return NULL;
+    }
+
+    token *next = peekToken();
+    if (next == NULL)
+    {
+        return e;
+    }
+
+    token *current;
+
+    // Keep trying to create a new expression with e as the leftExp as long as the operator precedence is greater
+    while (getOperatorPrecedence(next) > bp)
+    {
+        current = nextToken();
+        e = parseLeftDenotation(e, current);
+        if (e == NULL)
+        {
+            printf("Couldn't parse led\n");
+            return NULL;
+        }
+        next = peekToken();
+        // If there is no next token
+        if (next == NULL)
+        {
+            return e;
+        }
+    }
+    return e;
+}
+
+// operatorToken should be a binaryOp token
+expression *parseLeftDenotation(expression *left, token *operatorToken)
 {
     expression *e = malloc(sizeof(expression));
     if (e == NULL)
@@ -151,7 +193,34 @@ expression *parseExpression()
         return NULL;
     }
 
-    // Check for int value or unary operator
+    e->expL = left;
+    e->operator = operatorToken->lexeme[0];
+    e->type = BINARY_OP;
+    
+    // Parse the right side expression with supplying the operatorPrecedence
+    int precedence = getOperatorPrecedence(operatorToken);
+    e->expR = parseExpression(precedence);
+    if (e->expR == NULL)
+    {
+        printf("Error parsing expression\n");
+        // The left part of the tree is already built fully so every element of it needs to be freed
+        freeExpression(e->expL);
+        free(e);
+        return NULL;
+    }
+
+    return e;
+}
+
+expression *parseInitial()
+{
+    expression *e = malloc(sizeof(expression));
+    if (e == NULL)
+    {
+        printf("Memory allocation failed\n");
+        return NULL;
+    }
+
     token *tok = nextToken();
     if (tok == NULL)
     {
@@ -161,29 +230,36 @@ expression *parseExpression()
     }
     else if (tok->type == INT) // Const INT
     {
-        e->type = CONST;
+        e->type = INTEGER;
         e->value = tok->value;
+        // Default values for the rest of the fields
+        e->expL = NULL;
+        e->expR = NULL;
+        e->operator = '\0';
         e->unOp = NULL;
     }
     else if (tok->type == MINUS || tok->type == BITWISE_COMP || tok->type == LOGICAL_NEG) //UnaryOp
     {
         e->type = UNARY_OP;
         int value = -1;
+        e->expL = NULL;
+        e->expR = NULL;
+        e->operator = '\0';
         // Parse for the unarOp
         e->unOp = parseUnaryOp(tok);
         if (e->unOp == NULL)
         {
             printf("Error parsing unaryOp\n");
-            free(e);
             return NULL;
         }
     }
     else 
     {
-        printf("Missing expression\n");
         free(e);
+        printf("Missing expression\n");
         return NULL; 
     }
+
     return e;
 }
 
@@ -202,7 +278,7 @@ unaryOp *parseUnaryOp(token *tok)
 
     // Recursively parse to check for another unaryOp or const expression
     // Recursion should end when a const expression is met or all the tokens are consumed
-    u->innerExp = parseExpression();
+    u->innerExp = parseInitial();
     if (u->innerExp == NULL)
     {
         printf("Error parsing unaryOp\n");
@@ -211,6 +287,22 @@ unaryOp *parseUnaryOp(token *tok)
     }
 
     return u;
+}
+
+int getOperatorPrecedence(token *tok)
+{
+    switch (tok->type)
+    {
+        case ADD:
+            return 1;
+        case MINUS:
+            return 1;
+        case MULTIPLY:
+            return 2;
+        case DIVIDE:
+            return 2;
+    }
+    return -1;
 }
 
 void freeProgram(program *p)
@@ -236,17 +328,20 @@ void freeStatement(statement *s)
 
 void freeExpression(expression *e)
 {
-    // If it is a UNARY_OP then free the unaryOp first
-    if (e->type == UNARY_OP)
+    if (e->type == BINARY_OP)
+    {
+        freeExpression(e->expL);
+        freeExpression(e->expR);
+    }
+    else if (e->type == UNARY_OP)
     {
         freeUnaryOp(e->unOp);
     }
     free(e);
 }
 
-void freeUnaryOp(unaryOp *unOp)
+void freeUnaryOp(unaryOp *u)
 {
-    // Free the inner expressions
-    freeExpression(unOp->innerExp);
-    free(unOp);
+    freeExpression(u->innerExp);
+    free(u);
 }
