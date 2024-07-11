@@ -24,11 +24,55 @@ void writeExpression(FILE *outFile, expression *e)
     if (e->type == INTEGER)
     {
         // Move a 32-bit integer into the RAX register
-        fprintf(outFile, "\tmovl $%d, %%eax\n", e->value);
+        fprintf(outFile, "\tmov $%d, %%eax\n", e->value);
     }
     else if (e->type == UNARY_OP)
     {
         writeUnaryOp(outFile, e->unOp);
+    }
+    else if (e->type == BINARY_OP)
+    {
+        writeBinaryOp(outFile, e);
+    }
+}
+
+void writeBinaryOp(FILE *outFile, expression *e)
+{
+    // Write left side
+    writeExpression(outFile, e->expL);
+
+    // Push the value generated in rax onto the stack
+    fprintf(outFile, "\tpush %%rax\n");
+
+    // Write the right side
+    writeExpression(outFile, e->expR);
+
+    // Pop value off the right side and store into rcx
+    fprintf(outFile, "\tpop %%rcx\n");
+    
+    // Do the operator dependent operations
+    switch(e->operator)
+    {
+        case '+':
+            fprintf(outFile, "\tadd %%rcx, %%rax\n");
+            break;
+        case '-':
+            // Subtract rax from rcx (leftExp - rightExp)
+            // Store it into rcx
+            fprintf(outFile, "\tsub %%rax, %%rcx\n");
+            // Move the result in rcx back into rax
+            fprintf(outFile, "\tmov %%rcx, %%rax\n");
+            break;
+        case '*':
+            // Extend the value in rax to be in RDX:RAX
+            fprintf(outFile, "\tcqo\n");
+            fprintf(outFile, "\tmul %%rcx\n");
+            break;
+        case '/':
+            // Extend the number in rax by doubling its size so it takes up RDX:RAX
+            fprintf(outFile, "\tcqo\n");
+            fprintf(outFile, "\tdiv %%rcx\n");
+            break;
     }
 }
 
