@@ -6,5 +6,7 @@
 void freeTokens(token_list *tokens);
 token *nextToken();
 token *peekToken();
+void printTokens();
+
 
 #endif

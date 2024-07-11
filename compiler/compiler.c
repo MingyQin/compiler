@@ -42,14 +42,8 @@ int main(int argc, char *argv[])
     }
    
 
-    //printf("\n");
     // Print tokens
-    for (int i = 0; i < tokens->numTokens; i++)
-    {
-        printf("[%d, \"%s\", %d], ", tokens->list[i].type, tokens->list[i].lexeme, tokens->list[i].value);
-    }
-    printf("\n");
-
+    //printTokens();
 
     // Parse the tokens into an AST
 
@@ -137,4 +131,14 @@ token *peekToken()
         return NULL;
     }
     return &tokens->list[tokens->nextToken+1];
+}
+
+// Print the list of tokens
+void printTokens()
+{
+    for (int i = 0; i < tokens->numTokens; i++)
+    {
+        printf("[%d, \"%s\", %d], ", tokens->list[i].type, tokens->list[i].lexeme, tokens->list[i].value);
+    }
+    printf("\n");
 }
