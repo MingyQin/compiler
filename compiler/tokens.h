@@ -5,5 +5,6 @@
 
 void freeTokens(token_list *tokens);
 token *nextToken();
+token *peekToken();
 
 #endif

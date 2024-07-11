@@ -61,25 +61,41 @@ struct expression;
 
 typedef struct {
     char operator;
-    struct expression *innerExp;
-} unaryOp;
+    //expression *expL;
+    //expression *expR;
+} binaryOp;
 
 typedef struct {
     char operator;
-    struct expression *expL;
-    struct expression *expR;
-} binaryOp;
+    struct factor *innerFactor;
+} unaryOp;
 
-typedef struct expression {
-    enum {CONST, UNARY_OP, BINARY_OP} type;
+// Basic unit 
+// Can be a constant int, expression in parentheses, or a unaryOp
+typedef struct {
+    enum {
+        CONST, PAREN_EXP, UNARY_OP
+    } type;
     int value;
+    struct expression *exp;
     unaryOp *unOp;
-    binaryOp *binUp;
-} expression;
+} factor;
+
+// List of factors being * or /
+typedef struct {
+    factor *factor;
+    binaryOp *binOp;
+} term;
+ 
+// List of terms being + or -
+/*typedef struct expression {
+    term *term;
+    binaryOp *binOp;
+} expression;*/
 
 
 typedef struct {
-    expression *exp;
+    //expression *exp;
 } statement;
 
 typedef struct {
