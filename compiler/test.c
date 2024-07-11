@@ -196,6 +196,21 @@ expression *parseInitial()
             return NULL;
         }
     }
+    else if (tok->type == OPEN_PAR) // Parenthesized expression
+    {
+        // Free the expression already created
+        free(e);
+        // The new expression will be set to the expression created by parseExpression
+        e = parseExpression(0); // Parse a new expression resetting the binding power to 0
+        // Check for the matching closed paren
+        tok = nextToken();
+        if (tok == NULL || tok->type != CLOSED_PAR)
+        {
+            printf("Missing matching parentheses\n");
+            freeExpression(e);
+            return NULL;
+        }
+    }
     else 
     {
         free(e);
