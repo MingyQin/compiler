@@ -10,6 +10,10 @@
 struct expression;
 
 
+/*typedef struct {
+    char operator;
+    struct expression *innerExp;
+} unaryOp;*/
 
 typedef struct expression {
     enum {
@@ -17,17 +21,10 @@ typedef struct expression {
     } type;
     char operator;
     int value;
-    
+    unaryOp *unOp;
     struct expression *expL;
     struct expression *expR; 
 } expression;
-
-
-
-// Atoms can only be 
-typedef struct {
-    int value;
-} atom;
 
 static token_list *tokens;
 
@@ -37,7 +34,9 @@ expression *parseExpression(int bp);
 void printTree(expression *e);
 void freeTree(expression *e);
 int getOperatorPrecedence(token *tok);
-
+unaryOp *parseUnaryOp(token *tok);
+void freeUnary(unaryOp *u);
+void printUnaryOp(unaryOp *u);
 
 int main(int argc, char *argv[])
 {    
@@ -146,21 +145,70 @@ expression *parseInitial()
     }
 
     token *tok = nextToken();
-    if (tok->type != INT)
+    if (tok == NULL)
     {
-        printf("Missing integer\n");
+        printf("Missing expression\n");
+        free(e);
+        return NULL;
+    }
+    else if (tok->type == INT) // Const INT
+    {
+        e->type = INTEGER;
+        e->value = tok->value;
+        // Default values for the rest of the fields
+        e->expL = NULL;
+        e->expR = NULL;
+        e->operator = '\0';
+        e->unOp = NULL;
+    }
+    else if (tok->type == MINUS || tok->type == BITWISE_COMP || tok->type == LOGICAL_NEG) //UnaryOp
+    {
+        e->type = UNARY_OP;
+        int value = -1;
+        e->expL = NULL;
+        e->expR = NULL;
+        e->operator = '\0';
+        // Parse for the unarOp
+        e->unOp = parseUnaryOp(tok);
+        if (e->unOp == NULL)
+        {
+            printf("Error parsing unaryOp\n");
+            return NULL;
+        }
+    }
+    else 
+    {
+        printf("Missing expression\n");
+        return NULL; 
+    }
+
+    return e;
+}
+
+unaryOp *parseUnaryOp(token *tok)
+{
+    unaryOp *u = malloc(sizeof(unaryOp));
+    if (u == NULL)
+    {
+        free(u);
+        printf("Memory allocation failed\n");
+        return NULL;
+    }
+    // Set the type to the first character of the lexeme
+    // First character should be the operation while the 2nd character is \0
+    u->operator = tok->lexeme[0];
+
+    // Recursively parse to check for another unaryOp or const expression
+    // Recursion should end when a const expression is met or all the tokens are consumed
+    u->innerExp = parseInitial();
+    if (u->innerExp == NULL)
+    {
+        printf("Error parsing unaryOp\n");
+        free(u);
         return NULL;
     }
 
-    e->type = INTEGER;
-    e->value = tok->value;
-
-    // Default values for the rest of the fields
-    e->expL = NULL;
-    e->expR = NULL;
-    e->operator = '\0';
-
-    return e;
+    return u;
 }
 
 
@@ -174,10 +222,22 @@ void printTree(expression *e)
         printTree(e->expR);
         printf(")");
     }
+    else if (e->type == UNARY_OP)
+    {
+        printUnaryOp(e->unOp);
+    }
     else if (e->type == INTEGER)
     {
         printf("%d", e->value);
     }
+}
+
+void printUnaryOp(unaryOp *u)
+{
+    printf("(");
+    printf("%c", u->operator);
+    printTree(u->innerExp);
+    printf(")");
 }
 
 // Free tree of expressions
@@ -188,7 +248,17 @@ void freeTree(expression *e)
         freeTree(e->expL);
         freeTree(e->expR);
     }
+    else if (e->type == UNARY_OP)
+    {
+        freeUnary(e->unOp);
+    }
     free(e);
+}
+
+void freeUnary(unaryOp *u)
+{
+    freeTree(u->innerExp);
+    free(u);
 }
 
 
