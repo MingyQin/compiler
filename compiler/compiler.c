@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
     }
 
     // Prettyprint the AST
-    printProgram(ast);
+    //printProgram(ast);
 
     // Code generation
 

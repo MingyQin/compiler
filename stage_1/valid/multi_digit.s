@@ -2,5 +2,5 @@
 .globl main
 
 main:
-	movl $100, %eax
+	mov $100, %eax
 	ret
