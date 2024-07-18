@@ -115,7 +115,9 @@ void addIntegerToken(token *tokens, int index, char *lexeme, int lexemeLen)
 // WARNING !!!!
 // WORKS ONLY IF THE LEXEME IS ONE CHARACTER AND THEN A NULL TERMINATOR
 // ONLY FOR LEXEME WITH LENGTH OF 2
-void addSingleCharacterToken(token *tokens, int index, char *lexeme)
+// Returns 1 if token wasn't added
+// Returns 0 if token was added
+int addSingleCharacterToken(token *tokens, int index, char *lexeme)
 {
     switch (lexeme[0])
     {
@@ -152,6 +154,8 @@ void addSingleCharacterToken(token *tokens, int index, char *lexeme)
         case '/':
             tokens[index].type = DIVIDE;
             break;
+        default:
+            return 1;
     }
     tokens[index].lexeme = malloc(sizeof(char) * (2));
     if (tokens[index].lexeme == NULL)
@@ -161,6 +165,14 @@ void addSingleCharacterToken(token *tokens, int index, char *lexeme)
     }
     strncpy(tokens[index].lexeme, lexeme, 2);
     tokens[index].value = -1;
+
+    // Sucessfully added token
+    return 0;
+}
+
+void addDoubleCharacterToken(token *tokens, int index, char first, char next)
+{
+    
 }
 
 // Returns the amount of tokens created
@@ -181,13 +193,13 @@ token_list *lexFile(FILE *file)
     token *tokens = malloc(sizeof(token) * tokenList->maxSize);
     
 
-    regex_t singleCharToken;
-    // Make sure the minus sign is at the end because it has special effects when surrounded by characters
-    if (regcomp(&singleCharToken, "[{}();~!+*/-]", 0) != 0)
+    regex_t doubleCharToken; // possible characters that could be part of a two char sequence
+    if (regcomp(&doubleCharToken, "[<>=&|!]", 0) != 0)
     {
         puts("Regex compilation failed");
         return NULL;
     }
+    
 
 
     int index = 0;
@@ -218,7 +230,6 @@ token_list *lexFile(FILE *file)
             // Set the cursor back one to first character that scanWord consumed but didn't add to the buffer
             // So that no characters are skipped
             fseek(file, -1, SEEK_CUR);
-            c = fgetc(file);
         }  
         else if (isdigit(c)) // Numbers are stored as strings for now
         {
@@ -230,23 +241,32 @@ token_list *lexFile(FILE *file)
             // Set the cursor back one to first character that scanWord consumed but didn't add to the buffer
             // So that no characters are skipped
             fseek(file, -1, SEEK_CUR);
-            c = fgetc(file);
         }
         else // Single characters (punctuation and unitary operators)
         {
             buffer[0] = c;
             buffer[1] = '\0';
-            // Add token if it matches punctuation
-            if (regexec(&singleCharToken, buffer, 0, NULL, 0) == 0)
+            
+            // Check for a potential double character
+            /*if (regexec(&doubleCharToken, buffer, 0, NULL, 0) == 0)
             {
-                addSingleCharacterToken(tokens, index, buffer);
-                index++;
-            }
+                char first = buffer[0];
+                char next = peekChar(file);
+                if (first == '|' || first == '=' || first == '&')
+                {
 
-            // Get the next character to continue the loop
-            c = fgetc(file);
+                }
+            }*/
+            // If the token was added then increment index
+            if (addSingleCharacterToken(tokens, index, buffer) == 0) 
+            {
+                index++; 
+            }
         }
         // printf("%s", buffer); Check to see if it is reading through each character of the file
+        
+        // Read next char to continue loop
+        c = fgetc(file);
 
         // Check if the next token will be out of range
         if (index >= tokenList->maxSize)
@@ -263,7 +283,7 @@ token_list *lexFile(FILE *file)
 
     
     // Free buffer and regex
-    regfree(&singleCharToken);
+    regfree(&doubleCharToken);
     free(buffer);
 
     // Set the rest of the tokenList attributes
@@ -273,4 +293,15 @@ token_list *lexFile(FILE *file)
 
     // Return the number of 
     return tokenList;
+}
+
+char peekChar(FILE *file)
+{
+    // get the next character
+    char next = fgetc(file);
+
+    // Return the character to the stream so it can be read again
+    ungetc(next, file);
+
+    return next;
 }

@@ -1,24 +1,6 @@
 #ifndef TYPES_H
 #define TYPES_H
 
-
-/*typedef enum {
-    // Keywords
-    RETURN, KEYWORD_INT, 
-    
-    // Identifier
-    IDENTIFIER,
-
-    // Unary ops
-    NEGATION, BITWISE_COMP, LOGICAL_NEG,
-
-    // Datatypes
-    INT,
-
-    // Single-character (punctuation)
-    OPEN_BRACE, CLOSED_BRACE, OPEN_PAR, CLOSED_PAR, SEMICOLON
-} TOKEN_TYPE;*/
-
 typedef struct {
     enum {
     // Keywords
@@ -38,6 +20,13 @@ typedef struct {
 
     // Datatypes
     INT,
+
+    // Comparison operators (2 character)
+    OR, AND, EQUAL, NOT_EQUAL, LESS_EQUAL, GREATER_EQUAL,
+
+    // Comparison operators (1 character)
+    GREATER, LESS, 
+
 
     // Single-character (punctuation)
     OPEN_BRACE, CLOSED_BRACE, OPEN_PAR, CLOSED_PAR, SEMICOLON

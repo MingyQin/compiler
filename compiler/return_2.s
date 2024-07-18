@@ -2,17 +2,12 @@
 .globl main
 
 main:
-	mov $6, %eax
+	mov $12, %eax
+	neg %rax
 	push %rax
-	mov $3, %eax
+	mov $5, %eax
 	pop %rcx
 	xchg %rax, %rcx
 	cqo
-	div %rcx
-	push %rax
-	mov $2, %eax
-	pop %rcx
-	xchg %rax, %rcx
-	cqo
-	div %rcx
+	idiv %rcx
 	ret
