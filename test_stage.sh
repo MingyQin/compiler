@@ -14,7 +14,7 @@ for prog in `find . -type f -name "*.c" -path "./stage_$stage/valid/*" -not -pat
     ./a.out
     my_out=$?
 
-    echo my_out = $my_out
+    #echo my_out = $my_out
 
     # Compile using gcc
     gcc $prog
@@ -22,8 +22,14 @@ for prog in `find . -type f -name "*.c" -path "./stage_$stage/valid/*" -not -pat
     ./a.out
     correct_out=$?
 
-    echo correct_out = $correct_out
+    #echo correct_out = $correct_out
 
+    if [[ $my_out -eq $correct_out ]];
+    then
+        echo correct
+    else
+        echo wrong
+    fi
     
 done
 

@@ -67,14 +67,14 @@ void writeBinaryOp(FILE *outFile, expression *e)
             // The values in RCX and RAX don't have because order doesn't matter in multiplication
             // Extend the value in rax to be in RDX:RAX
             fprintf(outFile, "\tcqo\n");
-            fprintf(outFile, "\tmul %%rcx\n");
+            fprintf(outFile, "\timul %%rcx\n"); // Signed multiplication
             break;
         case '/':
             // Swap the values in RAX and RCX so that the left value is in RAX and the right value is in RCX
             fprintf(outFile, "\txchg %%rax, %%rcx\n");
             // Extend the number in rax by doubling its size so it takes up RDX:RAX
             fprintf(outFile, "\tcqo\n");
-            fprintf(outFile, "\tdiv %%rcx\n");
+            fprintf(outFile, "\tidiv %%rcx\n"); // Signed division
             break;
     }
 }
