@@ -22,7 +22,7 @@ typedef struct {
     INT,
 
     // Comparison operators (2 character)
-    OR, AND, EQUAL, NOT_EQUAL, LESS_EQUAL, GREATER_EQUAL,
+    OR, AND, EQUALS, NOT_EQUAL, LESS_EQUAL, GREATER_EQUAL,
 
     // Comparison operators (1 character)
     GREATER, LESS, 

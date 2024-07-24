@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
    
 
     // Print tokens
-    //printTokens();
+    printTokens();
 
     // Parse the tokens into an AST
 
@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
     }
 
     // Prettyprint the AST
-    printProgram(ast);
+    // printProgram(ast);
 
     // Code generation
 
@@ -82,14 +82,13 @@ int main(int argc, char *argv[])
 
     
     // Traverse the AST
-    writeFunction(outFile, ast->func);
+    //writeFunction(outFile, ast->func);
 
     // Ensure the file ends with a newline
     fprintf(outFile, "\n");
 
     // Free the tokens 
     freeTokens(tokens);
-    //free(outFileName);
 
     // Free the AST
     freeProgram(ast);

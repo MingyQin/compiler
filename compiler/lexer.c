@@ -5,6 +5,7 @@
 #include <regex.h>
 
 #include "types.h"
+#include "lexer.h"
 
 
 
@@ -154,6 +155,12 @@ int addSingleCharacterToken(token *tokens, int index, char *lexeme)
         case '/':
             tokens[index].type = DIVIDE;
             break;
+        case '<':
+            tokens[index].type = LESS;
+            break;
+        case '>':
+            tokens[index].type = GREATER;
+            break;
         default:
             return 1;
     }
@@ -170,9 +177,56 @@ int addSingleCharacterToken(token *tokens, int index, char *lexeme)
     return 0;
 }
 
-void addDoubleCharacterToken(token *tokens, int index, char first, char next)
+/*
+// Returns 1 if token wasn't added
+// Returns 0 if token was added
+*/
+int addDoubleCharacterToken(token *tokens, int index, char first, char next)
 {
-    
+    switch (first)
+    {
+        case '=':
+            if (first == next) tokens[index].type == EQUALS;
+            else return 1;
+            break;
+        case '|':
+            if (first == next) tokens[index].type == OR;
+            else return 1;
+            break;
+        case '&':
+            if (first == next) tokens[index].type == AND;
+            else return 1;
+            break;
+        case '!':
+            if (next == '=') tokens[index].type == NOT_EQUAL;
+            else return 1;
+            break;
+        case '>':
+            if (next == '=') tokens[index].type == GREATER_EQUAL;
+            else return 1;
+            break;
+        case '<':
+            if (next == '=') tokens[index].type == LESS_EQUAL;
+            else return 1;
+            break;
+        default:
+            // Return 1 if none of the first characters are correct
+            return 1;
+    }
+    tokens[index].lexeme = malloc(sizeof(char) * 3);
+    if (tokens[index].lexeme == NULL)
+    {
+        puts("Memory allocation failed");
+        exit(1);
+    }
+    // Set the lexeme
+    tokens[index].lexeme[0] = first;
+    tokens[index].lexeme[1] = next;
+    tokens[index].lexeme[2] = '\0';
+    tokens[index].value = -1;
+    return 0;
+
+
 }
 
 // Returns the amount of tokens created
@@ -247,19 +301,21 @@ token_list *lexFile(FILE *file)
             buffer[0] = c;
             buffer[1] = '\0';
             
+            // Characters needed for adding a doubleCharacterToken
+            char first = c;
+            char next = peekChar(file);
             // Check for a potential double character
-            /*if (regexec(&doubleCharToken, buffer, 0, NULL, 0) == 0)
+            if (addDoubleCharacterToken(tokens, index, first, next) == 0)
             {
-                char first = buffer[0];
-                char next = peekChar(file);
-                if (first == '|' || first == '=' || first == '&')
-                {
+                // Consume the character that was peeked at by skipping it
+                fseek(file, 1, SEEK_CUR);
+                // Increment th index if a token was added
+                index++;
 
-                }
-            }*/
-            // If the token was added then increment index
-            if (addSingleCharacterToken(tokens, index, buffer) == 0) 
-            {
+            }
+            else if (addSingleCharacterToken(tokens, index, buffer) == 0) // Only try adding a singleCharactertoken if a doubleCharacter wasn't added
+            {   
+                // If the token was added then increment index
                 index++; 
             }
         }
