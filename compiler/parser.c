@@ -163,20 +163,18 @@ expression *parseExpression(int bp)
 
     token *current;
 
-    // Get the precedence
-    int precedence = getOperatorPrecedence(next);
-    if (precedence == -1)
+    // Check for semicolon
+    if (next->type == SEMICOLON)
     {
-        printf("Unknown operator\n");
-        free(e);
-        return NULL;
+        return e;
     }
 
+    
     // Keep trying to create a new expression with e as the leftExp as long as the operator precedence is greater
-    while (precedence > bp)
+    while (getOperatorPrecedence(next) > bp)
     {
         current = nextToken();
-        e = parseLeftDenotation(e, current);
+        e = parseBinaryOp(e, current);
         if (e == NULL)
         {
             printf("Couldn't parse led\n");
@@ -193,7 +191,7 @@ expression *parseExpression(int bp)
 }
 
 // operatorToken should be a binaryOp token
-expression *parseLeftDenotation(expression *left, token *operatorToken)
+expression *parseBinaryOp(expression *left, token *operatorToken)
 {
     expression *e = malloc(sizeof(expression));
     if (e == NULL)

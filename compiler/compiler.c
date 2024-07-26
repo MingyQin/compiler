@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
     }
 
     // Prettyprint the AST
-    // printProgram(ast);
+    printProgram(ast);
 
     // Code generation
 
@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
 
     
     // Traverse the AST
-    //writeFunction(outFile, ast->func);
+    writeFunction(outFile, ast->func);
 
     // Ensure the file ends with a newline
     fprintf(outFile, "\n");

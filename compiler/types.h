@@ -50,14 +50,20 @@ struct expression;
 
 typedef struct {
     char operator;
-    //expression *expL;
-    //expression *expR;
-} binaryOp;
+    struct expression *expL;
+    struct expression *expR;
+} logicalExp;
 
 typedef struct {
     char operator;
     struct expression *innerExp;
 } unaryOp;
+
+typedef struct {
+    char operator;
+    struct expression *expL;
+    struct expression *expR; 
+} binaryOp;
  
 typedef struct expression {
     enum {

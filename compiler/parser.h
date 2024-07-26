@@ -7,7 +7,7 @@ program *parseProgram();
 function *parseFunc();
 statement *parseStatement();
 expression *parseInitial();
-expression *parseLeftDenotation(expression *left, token *operatorToken);
+expression *parseBinaryOp(expression *left, token *operatorToken);
 expression *parseExpression(int bp);
 unaryOp *parseUnaryOp(token *tok);
 int getOperatorPrecedence(token *tok);
