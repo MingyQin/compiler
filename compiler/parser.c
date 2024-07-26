@@ -163,8 +163,17 @@ expression *parseExpression(int bp)
 
     token *current;
 
+    // Get the precedence
+    int precedence = getOperatorPrecedence(next);
+    if (precedence == -1)
+    {
+        printf("Unknown operator\n");
+        free(e);
+        return NULL;
+    }
+
     // Keep trying to create a new expression with e as the leftExp as long as the operator precedence is greater
-    while (getOperatorPrecedence(next) > bp)
+    while (precedence > bp)
     {
         current = nextToken();
         e = parseLeftDenotation(e, current);
@@ -308,14 +317,30 @@ int getOperatorPrecedence(token *tok)
 {
     switch (tok->type)
     {
-        case ADD:
-            return 1;
-        case MINUS:
-            return 1;
         case MULTIPLY:
-            return 2;
+            return 6;
         case DIVIDE:
+            return 6;
+        case ADD:
+            return 5;
+        case MINUS:
+            return 5;
+        case GREATER:
+            return 4;
+        case GREATER_EQUAL:
+            return 4;
+        case LESS:
+            return 4;
+        case LESS_EQUAL:
+            return 4;
+        case EQUALS:
+            return 3;
+        case NOT_EQUAL:
+            return 3;
+        case AND:
             return 2;
+        case OR:
+            return 1;
     }
     return -1;
 }
