@@ -53,23 +53,23 @@ void writeBinaryOp(FILE *outFile, binaryOp *b)
     // Do the operator dependent operations
     switch(b->operator)
     {
-        case '+':
+        case ADD:
             fprintf(outFile, "\tadd %%rcx, %%rax\n");
             break;
-        case '-':
+        case MINUS:
             // Subtract rax from rcx (leftExp - rightExp)
             // Store it into rcx
             fprintf(outFile, "\tsub %%rax, %%rcx\n");
             // Move the result in rcx back into rax
             fprintf(outFile, "\tmov %%rcx, %%rax\n");
             break;
-        case '*':
+        case MULTIPLY:
             // The values in RCX and RAX don't have because order doesn't matter in multiplication
             // Extend the value in rax to be in RDX:RAX
             fprintf(outFile, "\tcqo\n");
             fprintf(outFile, "\timul %%rcx\n"); // Signed multiplication
             break;
-        case '/':
+        case DIVIDE:
             // Swap the values in RAX and RCX so that the left value is in RAX and the right value is in RCX
             fprintf(outFile, "\txchg %%rax, %%rcx\n");
             // Extend the number in rax by doubling its size so it takes up RDX:RAX

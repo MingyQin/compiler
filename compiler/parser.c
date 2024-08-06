@@ -176,9 +176,10 @@ expression *parseExpression(int bp)
         current = nextToken();
         e->binOp = parseBinaryOp(e, current);
         e->type = BINARY_OP; // This changes it the first time then repeatedly changes it to binary_op redundantly after
-        if (e->binOp == NULL)
+        if (e->binOp == NULL) // Ensure that there wasn't an error parsing the binaryOp
         {
             printf("Couldn't parse led\n");
+            // Free the expression itself
             free(e);
             return NULL;
         }
@@ -202,7 +203,7 @@ binaryOp *parseBinaryOp(expression *left, token *operatorToken)
         return NULL;
     }
 
-    // Copy the left struct
+    // Copy the left struct so that the original expression isn't affected
     expression *e = malloc(sizeof(expression));
     if (e == NULL)
     {
@@ -216,7 +217,7 @@ binaryOp *parseBinaryOp(expression *left, token *operatorToken)
     e->unOp = left->unOp;
 
     b->expL = e;
-    b->operator = operatorToken->lexeme[0];
+    b->operator = operatorToken->type;
     
     // Parse the right side binaryOp with supplying the operatorPrecedence
     int precedence = getOperatorPrecedence(operatorToken);

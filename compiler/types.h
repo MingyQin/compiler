@@ -52,17 +52,11 @@ struct expression;
 
 typedef struct {
     char operator;
-    struct expression *expL;
-    struct expression *expR;
-} logicalExp;
-
-typedef struct {
-    char operator;
     struct expression *innerExp;
 } unaryOp;
 
 typedef struct {
-    char operator;
+    token_type operator; // Should only be binary operators and not keywords of grammar
     struct expression *expL;
     struct expression *expR; 
 } binaryOp;

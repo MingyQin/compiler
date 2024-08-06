@@ -16,7 +16,7 @@ void printBinaryOp(binaryOp *b)
 {
     printf("(");
     printExpression(b->expL);
-    printf(" %c ", b->operator);
+    printf(" %s ", getOperator(b->operator));
     printExpression(b->expR);
     printf(")");
 }
@@ -68,4 +68,55 @@ void printProgram(program *p)
     {
         printFunction(p->func);
     }
+}
+
+
+// Converts a token_type to the character operator (can be up to a 2 character operator)
+// Returns ? if the operator is unknown
+char *getOperator(token_type operator)
+{
+    char *characters;
+    switch (operator)
+    {
+        case ADD:
+            characters = "+";
+            break;
+        case MINUS:
+            characters = "+";
+            break;
+        case MULTIPLY:
+            characters = "+";
+            break;
+        case DIVIDE:
+            characters = "+";
+            break;
+        case AND:
+            characters = "&&";
+            break;
+        case OR:
+            characters = "||";
+            break;
+        case NOT_EQUAL:
+            characters = "!=";
+            break;
+        case EQUALS:
+            characters = "==";
+            break;
+        case LESS_EQUAL:
+            characters = "<=";
+            break;
+        case GREATER_EQUAL:
+            characters = ">=";
+            break;
+        case GREATER:
+            characters = ">";
+            break;
+        case LESS:
+            characters = "<";
+            break;
+        default:
+            characters = "?";
+            break;
+    }
+    return characters;
 }

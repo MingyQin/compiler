@@ -6,5 +6,4 @@ main:
 	push %rax
 	mov $2, %eax
 	pop %rcx
-	add %rcx, %rax
 	ret
