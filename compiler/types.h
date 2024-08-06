@@ -1,8 +1,7 @@
 #ifndef TYPES_H
 #define TYPES_H
 
-typedef struct {
-    enum {
+typedef enum {
     // Keywords
     RETURN, KEYWORD_INT, 
     
@@ -30,7 +29,10 @@ typedef struct {
 
     // Single-character (punctuation)
     OPEN_BRACE, CLOSED_BRACE, OPEN_PAR, CLOSED_PAR, SEMICOLON
-    } type;
+} token_type;
+
+typedef struct {
+    token_type type;
     char *lexeme;
     int value;
 } token;
@@ -69,11 +71,9 @@ typedef struct expression {
     enum {
         BINARY_OP, INTEGER, UNARY_OP
     } type;
-    char operator;
     int value;
     unaryOp *unOp;
-    struct expression *expL;
-    struct expression *expR; 
+    binaryOp *binOp;
 } expression;
 
 

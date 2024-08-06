@@ -174,10 +174,12 @@ expression *parseExpression(int bp)
     while (getOperatorPrecedence(next) > bp)
     {
         current = nextToken();
-        e = parseBinaryOp(e, current);
-        if (e == NULL)
+        e->binOp = parseBinaryOp(e, current);
+        e->type = BINARY_OP; // This changes it the first time then repeatedly changes it to binary_op redundantly after
+        if (e->binOp == NULL)
         {
             printf("Couldn't parse led\n");
+            free(e);
             return NULL;
         }
         next = peekToken();
@@ -191,32 +193,44 @@ expression *parseExpression(int bp)
 }
 
 // operatorToken should be a binaryOp token
-expression *parseBinaryOp(expression *left, token *operatorToken)
+binaryOp *parseBinaryOp(expression *left, token *operatorToken)
 {
-    expression *e = malloc(sizeof(expression));
-    if (e == NULL)
+    binaryOp *b = malloc(sizeof(binaryOp));
+    if (b == NULL)
     {
         printf("Memory allocation failed\n");
         return NULL;
     }
 
-    e->expL = left;
-    e->operator = operatorToken->lexeme[0];
-    e->type = BINARY_OP;
-    
-    // Parse the right side expression with supplying the operatorPrecedence
-    int precedence = getOperatorPrecedence(operatorToken);
-    e->expR = parseExpression(precedence);
-    if (e->expR == NULL)
+    // Copy the left struct
+    expression *e = malloc(sizeof(expression));
+    if (e == NULL)
     {
-        printf("Error parsing expression\n");
+        printf("Memory allocation failed\n");
+        free(b);
+        return NULL;
+    }
+    e->value = left->value;
+    e->type = left->type;
+    e->binOp = left->binOp;
+    e->unOp = left->unOp;
+
+    b->expL = e;
+    b->operator = operatorToken->lexeme[0];
+    
+    // Parse the right side binaryOp with supplying the operatorPrecedence
+    int precedence = getOperatorPrecedence(operatorToken);
+    b->expR = parseExpression(precedence);
+    if (b->expR == NULL)
+    {
+        printf("Error parsing binaryOp\n");
         // The left part of the tree is already built fully so every element of it needs to be freed
-        freeExpression(e->expL);
-        free(e);
+        freeExpression(b->expL);
+        free(b);
         return NULL;
     }
 
-    return e;
+    return b;
 }
 
 expression *parseInitial()
@@ -240,18 +254,14 @@ expression *parseInitial()
         e->type = INTEGER;
         e->value = tok->value;
         // Default values for the rest of the fields
-        e->expL = NULL;
-        e->expR = NULL;
-        e->operator = '\0';
+        e->binOp = NULL;
         e->unOp = NULL;
     }
     else if (tok->type == MINUS || tok->type == BITWISE_COMP || tok->type == LOGICAL_NEG) //UnaryOp
     {
         e->type = UNARY_OP;
         int value = -1;
-        e->expL = NULL;
-        e->expR = NULL;
-        e->operator = '\0';
+        e->binOp = NULL;
         // Parse for the unarOp
         e->unOp = parseUnaryOp(tok);
         if (e->unOp == NULL)
@@ -368,14 +378,20 @@ void freeExpression(expression *e)
 {
     if (e->type == BINARY_OP)
     {
-        freeExpression(e->expL);
-        freeExpression(e->expR);
+        freeBinaryOp(e->binOp);
     }
     else if (e->type == UNARY_OP)
     {
         freeUnaryOp(e->unOp);
     }
     free(e);
+}
+
+void freeBinaryOp(binaryOp *b)
+{
+    freeExpression(b->expL);
+    freeExpression(b->expR);
+    free(b);
 }
 
 void freeUnaryOp(unaryOp *u)

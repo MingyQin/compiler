@@ -32,26 +32,26 @@ void writeExpression(FILE *outFile, expression *e)
     }
     else if (e->type == BINARY_OP)
     {
-        writeBinaryOp(outFile, e);
+        writeBinaryOp(outFile, e->binOp);
     }
 }
 
-void writeBinaryOp(FILE *outFile, expression *e)
+void writeBinaryOp(FILE *outFile, binaryOp *b)
 {
     // Write left side
-    writeExpression(outFile, e->expL);
+    writeExpression(outFile, b->expL);
 
     // Push the value generated in rax onto the stack
     fprintf(outFile, "\tpush %%rax\n");
 
     // Write the right side
-    writeExpression(outFile, e->expR);
+    writeExpression(outFile, b->expR);
 
     // Pop value off the right side and store into rcx
     fprintf(outFile, "\tpop %%rcx\n");
     
     // Do the operator dependent operations
-    switch(e->operator)
+    switch(b->operator)
     {
         case '+':
             fprintf(outFile, "\tadd %%rcx, %%rax\n");

@@ -12,15 +12,21 @@ void printUnaryOp(unaryOp *u)
     printf(")");
 }
 
+void printBinaryOp(binaryOp *b)
+{
+    printf("(");
+    printExpression(b->expL);
+    printf(" %c ", b->operator);
+    printExpression(b->expR);
+    printf(")");
+}
+
 void printExpression(expression *e)
 {
     if (e->type == BINARY_OP)
     {
-        printf("(");
-        printExpression(e->expL);
-        printf(" %c ", e->operator);
-        printExpression(e->expR);
-        printf(")");
+        printBinaryOp(e->binOp);
+       
     }
     else if (e->type == UNARY_OP)
     {
