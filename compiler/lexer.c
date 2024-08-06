@@ -186,27 +186,26 @@ int addDoubleCharacterToken(token *tokens, int index, char first, char next)
     switch (first)
     {
         case '=':
-            if (first == next) tokens[index].type == EQUALS;
+            if (first == next) tokens[index].type = EQUALS;
             else return 1;
-            break;
         case '|':
-            if (first == next) tokens[index].type == OR;
+            if (first == next) tokens[index].type = OR;
             else return 1;
             break;
         case '&':
-            if (first == next) tokens[index].type == AND;
+            if (first == next) tokens[index].type = AND;
             else return 1;
             break;
         case '!':
-            if (next == '=') tokens[index].type == NOT_EQUAL;
+            if (next == '=') tokens[index].type = NOT_EQUAL;
             else return 1;
             break;
         case '>':
-            if (next == '=') tokens[index].type == GREATER_EQUAL;
+            if (next == '=') tokens[index].type = GREATER_EQUAL;
             else return 1;
             break;
         case '<':
-            if (next == '=') tokens[index].type == LESS_EQUAL;
+            if (next == '=') tokens[index].type = LESS_EQUAL;
             else return 1;
             break;
         default:
@@ -244,7 +243,7 @@ token_list *lexFile(FILE *file)
     tokenList->maxSize = 100;
 
     // Temporary pointer for creating the token list
-    token *tokens = malloc(sizeof(token) * tokenList->maxSize);
+    token *tokens = calloc(tokenList->maxSize, sizeof(token));
     
 
     regex_t doubleCharToken; // possible characters that could be part of a two char sequence
