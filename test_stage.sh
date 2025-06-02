@@ -1,5 +1,5 @@
 #!/bin/bash
-stage=3
+stage=4
 
 for prog in `find . -type f -name "*.c" -path "./stage_$stage/valid/*" -not -path "*/valid_multifile/*" 2>/dev/null`; do
     # Use my compiler to compile it to assembly

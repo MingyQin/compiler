@@ -3,7 +3,5 @@
 
 int main(int argc, char **argv)
 {
-    char *c = "sdf";
-    printf("%s\n", c);
-    return 1;
+    return 1 == 1;
 }

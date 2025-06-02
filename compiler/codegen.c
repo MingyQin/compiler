@@ -76,6 +76,8 @@ void writeBinaryOp(FILE *outFile, binaryOp *b)
             fprintf(outFile, "\tcqo\n");
             fprintf(outFile, "\tidiv %%rcx\n"); // Signed division
             break;
+        case EQUALS:
+            
     }
 }
 
