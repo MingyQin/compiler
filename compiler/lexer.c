@@ -188,6 +188,7 @@ int addDoubleCharacterToken(token *tokens, int index, char first, char next)
         case '=':
             if (first == next) tokens[index].type = EQUALS;
             else return 1;
+            break;
         case '|':
             if (first == next) tokens[index].type = OR;
             else return 1;

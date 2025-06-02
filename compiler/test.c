@@ -1,7 +1,4 @@
-#include <stdlib.h>
-#include <stdio.h>
-
-int main(int argc, char **argv)
+int main()
 {
-    return 1 == 1;
+    return 5 <= 1;
 }

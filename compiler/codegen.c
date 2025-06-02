@@ -77,7 +77,58 @@ void writeBinaryOp(FILE *outFile, binaryOp *b)
             fprintf(outFile, "\tidiv %%rcx\n"); // Signed division
             break;
         case EQUALS:
-            
+            // Compare the two values of the expressions stored in rax and rcx (rcx-rax)
+            fprintf(outFile, "\tcmp %%rax, %%rcx\n");
+            // Zero out rax so the result can be set to the lower 8 bits
+            fprintf(outFile, "\tmov $0, %%rax\n");
+            // Set the result of the comparison to the lower 8 bits of rax
+            fprintf(outFile, "\tsete %%al\n");
+            break; 
+
+        case NOT_EQUAL:
+            // Compare the two values of the expressions stored in rax and rcx (rcx-rax)
+            fprintf(outFile, "\tcmp %%rax, %%rcx\n");
+            // Zero out rax so the result can be set to the lower 8 bits
+            fprintf(outFile, "\tmov $0, %%rax\n");
+            // Set the result of the comparison to the lower 8 bits of rax
+            fprintf(outFile, "\tsetne %%al\n");
+            break;
+
+        case GREATER:
+            // Compare the two values of the expressions stored in rax and rcx (rcx-rax)
+            fprintf(outFile, "\tcmp %%rax, %%rcx\n");
+            // Zero out rax so the result can be set to the lower 8 bits
+            fprintf(outFile, "\tmov $0, %%rax\n");
+            // Set the result of the comparison to the lower 8 bits of rax
+            fprintf(outFile, "\tsetg %%al\n");
+            break;
+
+        case GREATER_EQUAL:
+            // Compare the two values of the expressions stored in rax and rcx (rcx-rax)
+            fprintf(outFile, "\tcmp %%rax, %%rcx\n");
+            // Zero out rax so the result can be set to the lower 8 bits
+            fprintf(outFile, "\tmov $0, %%rax\n");
+            // Set the result of the comparison to the lower 8 bits of rax
+            fprintf(outFile, "\tsetge %%al\n");
+            break;
+
+        case LESS:
+            // Compare the two values of the expressions stored in rax and rcx (rcx-rax)
+            fprintf(outFile, "\tcmp %%rax, %%rcx\n");
+            // Zero out rax so the result can be set to the lower 8 bits
+            fprintf(outFile, "\tmov $0, %%rax\n");
+            // Set the result of the comparison to the lower 8 bits of rax
+            fprintf(outFile, "\tsetl %%al\n");
+            break;
+
+        case LESS_EQUAL:
+            // Compare the two values of the expressions stored in rax and rcx (rcx-rax)
+            fprintf(outFile, "\tcmp %%rax, %%rcx\n");
+            // Zero out rax so the result can be set to the lower 8 bits
+            fprintf(outFile, "\tmov $0, %%rax\n");
+            // Set the result of the comparison to the lower 8 bits of rax
+            fprintf(outFile, "\tsetle %%al\n");
+            break;
     }
 }
 
