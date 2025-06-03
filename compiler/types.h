@@ -78,7 +78,7 @@ typedef struct {
 
 typedef struct {
     char *id;
-    statement *statement;
+    statement **statement;
 } function;
 
 typedef struct {
