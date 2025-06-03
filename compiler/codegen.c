@@ -40,23 +40,32 @@ void writeBinaryOp(FILE *outFile, binaryOp *b)
 {
     // Write left side
     writeExpression(outFile, b->expL);
-
-    // Push the value generated in rax onto the stack
-    fprintf(outFile, "\tpush %%rax\n");
-
-    // Write the right side
-    writeExpression(outFile, b->expR);
-
-    // Pop value off the right side and store into rcx
-    fprintf(outFile, "\tpop %%rcx\n");
     
     // Do the operator dependent operations
     switch(b->operator)
     {
         case ADD:
+            // Push the value generated in rax onto the stack
+            fprintf(outFile, "\tpush %%rax\n");
+
+            // Write the right side
+            writeExpression(outFile, b->expR);
+
+            // Pop value off the left side and store into rcx
+            fprintf(outFile, "\tpop %%rcx\n");
+
             fprintf(outFile, "\tadd %%rcx, %%rax\n");
             break;
         case MINUS:
+            // Push the value generated in rax onto the stack
+            fprintf(outFile, "\tpush %%rax\n");
+
+            // Write the right side
+            writeExpression(outFile, b->expR);
+
+            // Pop value off the left side and store into rcx
+            fprintf(outFile, "\tpop %%rcx\n");
+
             // Subtract rax from rcx (leftExp - rightExp)
             // Store it into rcx
             fprintf(outFile, "\tsub %%rax, %%rcx\n");
@@ -64,12 +73,30 @@ void writeBinaryOp(FILE *outFile, binaryOp *b)
             fprintf(outFile, "\tmov %%rcx, %%rax\n");
             break;
         case MULTIPLY:
+            // Push the value generated in rax onto the stack
+            fprintf(outFile, "\tpush %%rax\n");
+
+            // Write the right side
+            writeExpression(outFile, b->expR);
+
+            // Pop value off the left side and store into rcx
+            fprintf(outFile, "\tpop %%rcx\n");
+
             // The values in RCX and RAX don't have because order doesn't matter in multiplication
             // Extend the value in rax to be in RDX:RAX
             fprintf(outFile, "\tcqo\n");
             fprintf(outFile, "\timul %%rcx\n"); // Signed multiplication
             break;
         case DIVIDE:
+            // Push the value generated in rax onto the stack
+            fprintf(outFile, "\tpush %%rax\n");
+
+            // Write the right side
+            writeExpression(outFile, b->expR);
+
+            // Pop value off the left side and store into rcx
+            fprintf(outFile, "\tpop %%rcx\n");
+
             // Swap the values in RAX and RCX so that the left value is in RAX and the right value is in RCX
             fprintf(outFile, "\txchg %%rax, %%rcx\n");
             // Extend the number in rax by doubling its size so it takes up RDX:RAX
@@ -77,6 +104,15 @@ void writeBinaryOp(FILE *outFile, binaryOp *b)
             fprintf(outFile, "\tidiv %%rcx\n"); // Signed division
             break;
         case EQUALS:
+            // Push the value generated in rax onto the stack
+            fprintf(outFile, "\tpush %%rax\n");
+
+            // Write the right side
+            writeExpression(outFile, b->expR);
+
+            // Pop value off the left side and store into rcx
+            fprintf(outFile, "\tpop %%rcx\n");
+
             // Compare the two values of the expressions stored in rax and rcx (rcx-rax)
             fprintf(outFile, "\tcmp %%rax, %%rcx\n");
             // Zero out rax so the result can be set to the lower 8 bits
@@ -86,6 +122,15 @@ void writeBinaryOp(FILE *outFile, binaryOp *b)
             break; 
 
         case NOT_EQUAL:
+            // Push the value generated in rax onto the stack
+            fprintf(outFile, "\tpush %%rax\n");
+
+            // Write the right side
+            writeExpression(outFile, b->expR);
+
+            // Pop value off the left side and store into rcx
+            fprintf(outFile, "\tpop %%rcx\n");
+
             // Compare the two values of the expressions stored in rax and rcx (rcx-rax)
             fprintf(outFile, "\tcmp %%rax, %%rcx\n");
             // Zero out rax so the result can be set to the lower 8 bits
@@ -95,6 +140,15 @@ void writeBinaryOp(FILE *outFile, binaryOp *b)
             break;
 
         case GREATER:
+            // Push the value generated in rax onto the stack
+            fprintf(outFile, "\tpush %%rax\n");
+
+            // Write the right side
+            writeExpression(outFile, b->expR);
+
+            // Pop value off the left side and store into rcx
+            fprintf(outFile, "\tpop %%rcx\n");
+
             // Compare the two values of the expressions stored in rax and rcx (rcx-rax)
             fprintf(outFile, "\tcmp %%rax, %%rcx\n");
             // Zero out rax so the result can be set to the lower 8 bits
@@ -104,6 +158,15 @@ void writeBinaryOp(FILE *outFile, binaryOp *b)
             break;
 
         case GREATER_EQUAL:
+            // Push the value generated in rax onto the stack
+            fprintf(outFile, "\tpush %%rax\n");
+
+            // Write the right side
+            writeExpression(outFile, b->expR);
+
+            // Pop value off the left side and store into rcx
+            fprintf(outFile, "\tpop %%rcx\n");
+
             // Compare the two values of the expressions stored in rax and rcx (rcx-rax)
             fprintf(outFile, "\tcmp %%rax, %%rcx\n");
             // Zero out rax so the result can be set to the lower 8 bits
@@ -113,6 +176,15 @@ void writeBinaryOp(FILE *outFile, binaryOp *b)
             break;
 
         case LESS:
+            // Push the value generated in rax onto the stack
+            fprintf(outFile, "\tpush %%rax\n");
+
+            // Write the right side
+            writeExpression(outFile, b->expR);
+
+            // Pop value off the left side and store into rcx
+            fprintf(outFile, "\tpop %%rcx\n");
+
             // Compare the two values of the expressions stored in rax and rcx (rcx-rax)
             fprintf(outFile, "\tcmp %%rax, %%rcx\n");
             // Zero out rax so the result can be set to the lower 8 bits
@@ -122,6 +194,15 @@ void writeBinaryOp(FILE *outFile, binaryOp *b)
             break;
 
         case LESS_EQUAL:
+            // Push the value generated in rax onto the stack
+            fprintf(outFile, "\tpush %%rax\n");
+
+            // Write the right side
+            writeExpression(outFile, b->expR);
+
+            // Pop value off the left side and store into rcx
+            fprintf(outFile, "\tpop %%rcx\n");
+
             // Compare the two values of the expressions stored in rax and rcx (rcx-rax)
             fprintf(outFile, "\tcmp %%rax, %%rcx\n");
             // Zero out rax so the result can be set to the lower 8 bits
@@ -129,8 +210,15 @@ void writeBinaryOp(FILE *outFile, binaryOp *b)
             // Set the result of the comparison to the lower 8 bits of rax
             fprintf(outFile, "\tsetle %%al\n");
             break;
+        
+        case OR:
+            fprintf(outFile, "$0, %%rax");
+            fprintf(outFile, "jmp _");
+            fprintf(outFile, "$0, %%rax");
+            break;
     }
 }
+
 
 void writeUnaryOp(FILE *outFile, unaryOp *u)
 {
