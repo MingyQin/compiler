@@ -13,6 +13,7 @@
 // Consumes characters including the first character not alphbetical
 int scanWord(char first, char *buffer, FILE *file)
 {
+    // Max character length of word
     int maxBufferSize = 100;
     int i = 0;
     char c = first;
