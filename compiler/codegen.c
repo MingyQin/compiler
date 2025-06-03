@@ -2,6 +2,8 @@
 #include "types.h"
 #include "codegen.h"
 
+// For the label generator to generate new labels
+int counter = 0;
 
 // Write a function in assembly
 void writeFunction(FILE *outFile, function *f)
@@ -41,182 +43,161 @@ void writeBinaryOp(FILE *outFile, binaryOp *b)
     // Write left side
     writeExpression(outFile, b->expL);
     
-    // Do the operator dependent operations
-    switch(b->operator)
+    if (b->operator == OR || b->operator == AND)
     {
-        case ADD:
-            // Push the value generated in rax onto the stack
-            fprintf(outFile, "\tpush %%rax\n");
+        // Create clause2 and end labels
+        int clause2 = getLabel();
+        int end = getLabel();
 
-            // Write the right side
-            writeExpression(outFile, b->expR);
+        switch (b->operator)
+        {
+            case OR:
+                // See if the 1st expression was false
+                fprintf(outFile, "\tcmp $0, %%rax\n");
 
-            // Pop value off the left side and store into rcx
-            fprintf(outFile, "\tpop %%rcx\n");
+                // Number label for the 2nd clause of the OR statement (2nd expression)
+                // Jump to right expression if the left is false
+                fprintf(outFile, "\tje _%d\n", clause2);
 
-            fprintf(outFile, "\tadd %%rcx, %%rax\n");
-            break;
-        case MINUS:
-            // Push the value generated in rax onto the stack
-            fprintf(outFile, "\tpush %%rax\n");
+                // If right exp is true then set rax to 1 and jump to end (short-circuit)
+                fprintf(outFile, "\tmov $1, %%rax\n");
+                // Number label for the end of the statement
+                fprintf(outFile, "\tjmp _%d\n", end);
 
-            // Write the right side
-            writeExpression(outFile, b->expR);
+                // Write clause2 (evaulate the 2nd expression)
+                fprintf(outFile, "_%d:\n", clause2);
+                writeExpression(outFile, b->expR);
 
-            // Pop value off the left side and store into rcx
-            fprintf(outFile, "\tpop %%rcx\n");
+                // See if the right expression was false
+                fprintf(outFile, "\tcmp $0, %%rax\n");
+                fprintf(outFile, "\tmov $0, %%rax\n");
 
-            // Subtract rax from rcx (leftExp - rightExp)
-            // Store it into rcx
-            fprintf(outFile, "\tsub %%rax, %%rcx\n");
-            // Move the result in rcx back into rax
-            fprintf(outFile, "\tmov %%rcx, %%rax\n");
-            break;
-        case MULTIPLY:
-            // Push the value generated in rax onto the stack
-            fprintf(outFile, "\tpush %%rax\n");
+                // Set the al to if the right exp true or false
+                fprintf(outFile, "\tsetne %%al\n");
 
-            // Write the right side
-            writeExpression(outFile, b->expR);
+                // Label next expression
+                fprintf(outFile, "_%d:\n", end);
+                break;
+            case AND:
+                // See if the 1st expression was false
+                fprintf(outFile, "\tcmp $0, %%rax\n");
 
-            // Pop value off the left side and store into rcx
-            fprintf(outFile, "\tpop %%rcx\n");
+                // Jump if the first statement was true (check 2nd expression)
+                fprintf(outFile, "\tjne _%d\n", clause2);
+                // Number label for the end of the statement
+                // Jump to next statement if the first statement was false (short-circuit)
+                fprintf(outFile, "\tjmp _%d\n", end);
 
-            // The values in RCX and RAX don't have because order doesn't matter in multiplication
-            // Extend the value in rax to be in RDX:RAX
-            fprintf(outFile, "\tcqo\n");
-            fprintf(outFile, "\timul %%rcx\n"); // Signed multiplication
-            break;
-        case DIVIDE:
-            // Push the value generated in rax onto the stack
-            fprintf(outFile, "\tpush %%rax\n");
+                // Write clause2 (evaulate the 2nd expression)
+                fprintf(outFile, "_%d:\n", clause2);
+                writeExpression(outFile, b->expR);
 
-            // Write the right side
-            writeExpression(outFile, b->expR);
+                // See if the right expression was false
+                fprintf(outFile, "\tcmp $0, %%rax\n");
+                fprintf(outFile, "\tmov $0, %%rax\n");
 
-            // Pop value off the left side and store into rcx
-            fprintf(outFile, "\tpop %%rcx\n");
+                // Set the al to if the right exp was true or false
+                fprintf(outFile, "\tsetne %%al\n");
 
-            // Swap the values in RAX and RCX so that the left value is in RAX and the right value is in RCX
-            fprintf(outFile, "\txchg %%rax, %%rcx\n");
-            // Extend the number in rax by doubling its size so it takes up RDX:RAX
-            fprintf(outFile, "\tcqo\n");
-            fprintf(outFile, "\tidiv %%rcx\n"); // Signed division
-            break;
-        case EQUALS:
-            // Push the value generated in rax onto the stack
-            fprintf(outFile, "\tpush %%rax\n");
-
-            // Write the right side
-            writeExpression(outFile, b->expR);
-
-            // Pop value off the left side and store into rcx
-            fprintf(outFile, "\tpop %%rcx\n");
-
-            // Compare the two values of the expressions stored in rax and rcx (rcx-rax)
-            fprintf(outFile, "\tcmp %%rax, %%rcx\n");
-            // Zero out rax so the result can be set to the lower 8 bits
-            fprintf(outFile, "\tmov $0, %%rax\n");
-            // Set the result of the comparison to the lower 8 bits of rax
-            fprintf(outFile, "\tsete %%al\n");
-            break; 
-
-        case NOT_EQUAL:
-            // Push the value generated in rax onto the stack
-            fprintf(outFile, "\tpush %%rax\n");
-
-            // Write the right side
-            writeExpression(outFile, b->expR);
-
-            // Pop value off the left side and store into rcx
-            fprintf(outFile, "\tpop %%rcx\n");
-
-            // Compare the two values of the expressions stored in rax and rcx (rcx-rax)
-            fprintf(outFile, "\tcmp %%rax, %%rcx\n");
-            // Zero out rax so the result can be set to the lower 8 bits
-            fprintf(outFile, "\tmov $0, %%rax\n");
-            // Set the result of the comparison to the lower 8 bits of rax
-            fprintf(outFile, "\tsetne %%al\n");
-            break;
-
-        case GREATER:
-            // Push the value generated in rax onto the stack
-            fprintf(outFile, "\tpush %%rax\n");
-
-            // Write the right side
-            writeExpression(outFile, b->expR);
-
-            // Pop value off the left side and store into rcx
-            fprintf(outFile, "\tpop %%rcx\n");
-
-            // Compare the two values of the expressions stored in rax and rcx (rcx-rax)
-            fprintf(outFile, "\tcmp %%rax, %%rcx\n");
-            // Zero out rax so the result can be set to the lower 8 bits
-            fprintf(outFile, "\tmov $0, %%rax\n");
-            // Set the result of the comparison to the lower 8 bits of rax
-            fprintf(outFile, "\tsetg %%al\n");
-            break;
-
-        case GREATER_EQUAL:
-            // Push the value generated in rax onto the stack
-            fprintf(outFile, "\tpush %%rax\n");
-
-            // Write the right side
-            writeExpression(outFile, b->expR);
-
-            // Pop value off the left side and store into rcx
-            fprintf(outFile, "\tpop %%rcx\n");
-
-            // Compare the two values of the expressions stored in rax and rcx (rcx-rax)
-            fprintf(outFile, "\tcmp %%rax, %%rcx\n");
-            // Zero out rax so the result can be set to the lower 8 bits
-            fprintf(outFile, "\tmov $0, %%rax\n");
-            // Set the result of the comparison to the lower 8 bits of rax
-            fprintf(outFile, "\tsetge %%al\n");
-            break;
-
-        case LESS:
-            // Push the value generated in rax onto the stack
-            fprintf(outFile, "\tpush %%rax\n");
-
-            // Write the right side
-            writeExpression(outFile, b->expR);
-
-            // Pop value off the left side and store into rcx
-            fprintf(outFile, "\tpop %%rcx\n");
-
-            // Compare the two values of the expressions stored in rax and rcx (rcx-rax)
-            fprintf(outFile, "\tcmp %%rax, %%rcx\n");
-            // Zero out rax so the result can be set to the lower 8 bits
-            fprintf(outFile, "\tmov $0, %%rax\n");
-            // Set the result of the comparison to the lower 8 bits of rax
-            fprintf(outFile, "\tsetl %%al\n");
-            break;
-
-        case LESS_EQUAL:
-            // Push the value generated in rax onto the stack
-            fprintf(outFile, "\tpush %%rax\n");
-
-            // Write the right side
-            writeExpression(outFile, b->expR);
-
-            // Pop value off the left side and store into rcx
-            fprintf(outFile, "\tpop %%rcx\n");
-
-            // Compare the two values of the expressions stored in rax and rcx (rcx-rax)
-            fprintf(outFile, "\tcmp %%rax, %%rcx\n");
-            // Zero out rax so the result can be set to the lower 8 bits
-            fprintf(outFile, "\tmov $0, %%rax\n");
-            // Set the result of the comparison to the lower 8 bits of rax
-            fprintf(outFile, "\tsetle %%al\n");
-            break;
-        
-        case OR:
-            fprintf(outFile, "$0, %%rax");
-            fprintf(outFile, "jmp _");
-            fprintf(outFile, "$0, %%rax");
-            break;
+                // Label next expression
+                fprintf(outFile, "_%d:\n", end);
+                break;
+        }
     }
+    // Not AND or OR statement
+    else {
+        // Solve rightside and store value into rcx
+        // Push the value generated in rax onto the stack
+        fprintf(outFile, "\tpush %%rax\n");
+
+        // Write the right side
+        writeExpression(outFile, b->expR);
+
+        // Pop value off the left side and store into rcx
+        fprintf(outFile, "\tpop %%rcx\n");
+        // Do the operator dependent operations
+        switch(b->operator)
+        {
+            case ADD:
+                fprintf(outFile, "\tadd %%rcx, %%rax\n");
+                break;
+            case MINUS:
+                // Subtract rax from rcx (leftExp - rightExp)
+                // Store it into rcx
+                fprintf(outFile, "\tsub %%rax, %%rcx\n");
+                // Move the result in rcx back into rax
+                fprintf(outFile, "\tmov %%rcx, %%rax\n");
+                break;
+            case MULTIPLY:
+                // The values in RCX and RAX don't have because order doesn't matter in multiplication
+                // Extend the value in rax to be in RDX:RAX
+                fprintf(outFile, "\tcqo\n");
+                fprintf(outFile, "\timul %%rcx\n"); // Signed multiplication
+                break;
+            case DIVIDE:
+                // Swap the values in RAX and RCX so that the left value is in RAX and the right value is in RCX
+                fprintf(outFile, "\txchg %%rax, %%rcx\n");
+                // Extend the number in rax by doubling its size so it takes up RDX:RAX
+                fprintf(outFile, "\tcqo\n");
+                fprintf(outFile, "\tidiv %%rcx\n"); // Signed division
+                break;
+            case EQUALS:
+                // Compare the two values of the expressions stored in rax and rcx (rcx-rax)
+                fprintf(outFile, "\tcmp %%rax, %%rcx\n");
+                // Zero out rax so the result can be set to the lower 8 bits
+                fprintf(outFile, "\tmov $0, %%rax\n");
+                // Set the result of the comparison to the lower 8 bits of rax
+                fprintf(outFile, "\tsete %%al\n");
+                break; 
+
+            case NOT_EQUAL:
+                // Compare the two values of the expressions stored in rax and rcx (rcx-rax)
+                fprintf(outFile, "\tcmp %%rax, %%rcx\n");
+                // Zero out rax so the result can be set to the lower 8 bits
+                fprintf(outFile, "\tmov $0, %%rax\n");
+                // Set the result of the comparison to the lower 8 bits of rax
+                fprintf(outFile, "\tsetne %%al\n");
+                break;
+
+            case GREATER:
+                // Compare the two values of the expressions stored in rax and rcx (rcx-rax)
+                fprintf(outFile, "\tcmp %%rax, %%rcx\n");
+                // Zero out rax so the result can be set to the lower 8 bits
+                fprintf(outFile, "\tmov $0, %%rax\n");
+                // Set the result of the comparison to the lower 8 bits of rax
+                fprintf(outFile, "\tsetg %%al\n");
+                break;
+
+            case GREATER_EQUAL:
+                // Compare the two values of the expressions stored in rax and rcx (rcx-rax)
+                fprintf(outFile, "\tcmp %%rax, %%rcx\n");
+                // Zero out rax so the result can be set to the lower 8 bits
+                fprintf(outFile, "\tmov $0, %%rax\n");
+                // Set the result of the comparison to the lower 8 bits of rax
+                fprintf(outFile, "\tsetge %%al\n");
+                break;
+
+            case LESS:
+                // Compare the two values of the expressions stored in rax and rcx (rcx-rax)
+                fprintf(outFile, "\tcmp %%rax, %%rcx\n");
+                // Zero out rax so the result can be set to the lower 8 bits
+                fprintf(outFile, "\tmov $0, %%rax\n");
+                // Set the result of the comparison to the lower 8 bits of rax
+                fprintf(outFile, "\tsetl %%al\n");
+                break;
+
+            case LESS_EQUAL:
+                // Compare the two values of the expressions stored in rax and rcx (rcx-rax)
+                fprintf(outFile, "\tcmp %%rax, %%rcx\n");
+                // Zero out rax so the result can be set to the lower 8 bits
+                fprintf(outFile, "\tmov $0, %%rax\n");
+                // Set the result of the comparison to the lower 8 bits of rax
+                fprintf(outFile, "\tsetle %%al\n");
+                break;
+        }
+    }
+
+    
 }
 
 
@@ -246,4 +227,11 @@ void writeUnaryOp(FILE *outFile, unaryOp *u)
 void writeProgram(FILE *outFile, program *p)
 {
     writeFunction(outFile, p->func);
+}
+
+// Generates labels for jump points in the assembly
+int getLabel()
+{
+    counter++;
+    return counter;
 }
