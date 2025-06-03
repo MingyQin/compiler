@@ -60,25 +60,33 @@ typedef struct {
     struct expression *expL;
     struct expression *expR; 
 } binaryOp;
+
+// Only supports integer variables for now
+typedef struct variable {
+    int value;
+    char *id; 
+} variable;
  
 typedef struct expression {
     enum {
-        BINARY_OP, INTEGER, UNARY_OP
+        BINARY_OP, INTEGER, UNARY_OP, ASSIGN
     } type;
     int value;
     unaryOp *unOp;
     binaryOp *binOp;
+    variable *var;
 } expression;
 
-
-
 typedef struct {
+    enum {
+        RETURN, EXP
+    } type; 
     expression *exp;
 } statement;
 
 typedef struct {
     char *id;
-    statement **statement;
+    statement **statement; //List of statements
 } function;
 
 typedef struct {
