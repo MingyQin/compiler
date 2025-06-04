@@ -1,6 +1,8 @@
 #include "types.h"
 #include "pprint.h"
 #include <stdio.h>
+#include "keywords.h"
+
 
 void printUnaryOp(unaryOp *u)
 {
@@ -32,7 +34,7 @@ void printExpression(expression *e)
     {
         printUnaryOp(e->unOp);
     }
-    else if (e->type == INTEGER)
+    else if (e->type == INT)
     {
         printf("%d", e->value);
     }
@@ -54,9 +56,9 @@ void printFunction(function *f)
     else 
     {
         printf("FUNC %s:\n\tbody:\n", f->id);
-        if (f->statement != NULL)
+        for (int i = 0; i < f->numStatements; i++)
         {
-            printStatement(f->statement);
+            printStatement(f->statements[i]);
         }
     }
 }   

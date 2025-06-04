@@ -4,6 +4,7 @@
 #include "types.h"
 #include "parser.h"
 #include "tokens.h"
+#include "keywords.h"
 
 
 program *parseProgram()
@@ -81,22 +82,88 @@ function *parseFunc()
         free(f);
         return NULL;
     }
-
-    // Parse statement
-    statement *s= parseStatement();
-    // If the statement couldn't be parsed return NULL
-    if (s == NULL)
+    
+    // Starting number of statements is 100
+    int maxNumStatements = 100;
+    statement **statements = malloc(sizeof(statement)*maxNumStatements);
+    if (statements == NULL)
     {
-        free(f);
+        printf("Memory allocation failed\n");
         return NULL;
     }
-    f->statement = s;
+
+    // Index for the next statement
+    int snum = 0;
+    // Parse statements until there are none left
+    token *next = peekToken();
+    if (next == NULL)
+    {
+        free(f);
+        return NULL; 
+    }
+
+    while (next->type != CLOSED_BRACE)
+    {
+        statements[snum] = parseStatement();
+        // If the statement couldn't be parsed return NULL
+        if (statements == NULL)
+        {
+            // Free the remaining statements in the function
+            f->numStatements = snum; // Used to traverse through the number of statements and free them
+            f->statements = statements;
+            freeFunc(f);
+            printf("Failure to parse statement %d\n", snum);
+            return NULL;
+        }
+
+        // Move to the next index for the next statement in the list
+        snum++;
+
+        // If the next statement would be out of range expand the buffer
+        if (snum > maxNumStatements)
+        {
+            maxNumStatements+=100;
+            statements = realloc(f->statements, sizeof(statement)*maxNumStatements);
+            if (statements == NULL)
+            {
+                printf("Memory allocation failed\n");
+                f->numStatements = snum; // Used to traverse through the number of statements and free them
+                f->statements = statements;
+                freeFunc(f);
+                return NULL;
+            }
+
+        }
+        next = peekToken();
+        if (next == NULL)
+        {
+            f->numStatements = snum; // Used to traverse through the number of statements and free them
+            f->statements = statements;
+            freeFunc(f);
+            printf("Failure to parse statement %d\n", snum);
+            return NULL;
+        }
+    }
+
+    // Finish supplying information for the function struct
+    f->numStatements = snum;
+    f->statements = statements;
+
+    // Ensure that the last statement is a return statement
+    if (f->statements[f->numStatements-1]->type != RETURN )
+    {
+        freeFunc(f);
+        printf("Missing return statement\n");
+        return NULL;
+    }
     
+    // Consume last CLOSED_BRACE token
     tok = nextToken();
     if (tok == NULL || tok->type != CLOSED_BRACE)
     {
         printf("Missing bracket\n");
-        free(f);
+        // Free the remaining statements in the function
+        freeFunc(f);
         return NULL;
     }
     return f;
@@ -112,24 +179,46 @@ statement *parseStatement()
         return NULL;
     }
 
-    // Check for return statement
+    // Get next token
     token *tok = nextToken();
-    if (tok == NULL || tok->type != RETURN)
+    if (tok == NULL)
     {
         printf("Missing return statement\n");
         free(s);
         return NULL;
     }
+    expression *e;
 
-    // Get expression
-    // Start with the lowest precedence level
-    expression *e = parseExpression(0);
-    if (e == NULL)
-    {
-        free(s);
-        return NULL;
+    switch (tok->type) {
+        // Return statement
+        case RETURN:
+            s->type = RETURN;
+            // Get expression
+            // Start with the lowest precedence level
+            e = parseExpression(0);
+            if (e == NULL)
+            {
+                free(s);
+                return NULL;
+            }
+            s->exp = e;
+            break;
+        // Normal expression
+        default:
+            s->type = EXP;
+            // Get expression
+            // Start with the lowest precedence level
+            e = parseExpression(0);
+            if (e == NULL)
+            {
+                free(s);
+                return NULL;
+            }
+            s->exp = e;
+            break;
     }
-    s->exp = e;
+    
+    
 
     //Check for a semicolon
     tok = nextToken();
@@ -252,7 +341,7 @@ expression *parseInitial()
     }
     else if (tok->type == INT) // Const INT
     {
-        e->type = INTEGER;
+        e->type = INT;
         e->value = tok->value;
         // Default values for the rest of the fields
         e->binOp = NULL;
@@ -360,15 +449,21 @@ void freeProgram(program *p)
     free(p);
 }
 
+// f->numStatements MUST BE DEFINED FOR THIS TO WORK
 void freeFunc(function *f)
 {
     // The id points to an array of chars also pointed to by the node list
     // Free this chunk of memory is given to the freeTokens() function
     //free(f->id);
-    freeStatement(f->statement);
+    for (int i = 0; i < f->numStatements; i++)
+    {
+        // Make sure that the statement is only freed if it exists
+        // Protects agaisnt invalid reads when the statement fails to parse and the structs need to be cleaned up
+        freeStatement(f->statements[i]);
+    }
+    free(f->statements);
     free(f);
 }
-
 void freeStatement(statement *s)
 {
     freeExpression(s->exp);

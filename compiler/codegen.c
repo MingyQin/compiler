@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "types.h"
 #include "codegen.h"
+#include "keywords.h"
 
 // For the label generator to generate new labels
 int counter = 0;
@@ -10,20 +11,26 @@ void writeFunction(FILE *outFile, function *f)
 {
     char *funcName = f->id;
     fprintf(outFile, ".text\n.globl %s\n\n%s:\n", funcName, funcName);
-    writeStatement(outFile, f->statement);
+
+    // Write each sequence one by one
+    for (int i = 0; i < f->numStatements; i++)
+    {
+        writeStatement(outFile, f->statements[i]);
+    }
+    fprintf(outFile, "\tret"); // Functions require return statements at the end
+
 }
 
 // Write a basic return statement
 void writeStatement(FILE *outFile, statement *s)
 {
     writeExpression(outFile, s->exp);
-    fprintf(outFile, "\tret");
 }
 
 // Write an integer or unaryOp expression
 void writeExpression(FILE *outFile, expression *e)
 {
-    if (e->type == INTEGER)
+    if (e->type == INT)
     {
         // Move a 32-bit integer into the RAX register
         fprintf(outFile, "\tmov $%d, %%eax\n", e->value);

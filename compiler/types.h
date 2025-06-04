@@ -32,7 +32,7 @@ typedef enum {
 } token_type;
 
 typedef struct {
-    token_type type;
+    int type; // Uses types from keywords.h
     char *lexeme;
     int value;
 } token;
@@ -68,9 +68,7 @@ typedef struct variable {
 } variable;
  
 typedef struct expression {
-    enum {
-        BINARY_OP, INTEGER, UNARY_OP, ASSIGN
-    } type;
+    int type; //Uses types from keywords.h
     int value;
     unaryOp *unOp;
     binaryOp *binOp;
@@ -78,15 +76,14 @@ typedef struct expression {
 } expression;
 
 typedef struct {
-    enum {
-        RETURN, EXP
-    } type; 
+    int type; // Uses types from the keywords.h
     expression *exp;
 } statement;
 
 typedef struct {
     char *id;
-    statement **statement; //List of statements
+    statement **statements; //List of statements
+    int numStatements; // Length of statement list
 } function;
 
 typedef struct {

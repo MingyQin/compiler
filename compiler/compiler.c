@@ -47,6 +47,7 @@ int main(int argc, char *argv[])
 
     // Parse the tokens into an AST
 
+    
     // Root node of the AST
     program *ast = parseProgram();
     if (ast == NULL)

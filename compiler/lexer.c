@@ -6,6 +6,7 @@
 
 #include "types.h"
 #include "lexer.h"
+#include "keywords.h"
 
 
 
@@ -162,6 +163,9 @@ int addSingleCharacterToken(token *tokens, int index, char *lexeme)
         case '>':
             tokens[index].type = GREATER;
             break;
+        case '=':
+            tokens[index].type = ASSIGN;
+            break;
         default:
             return 1;
     }
@@ -184,6 +188,7 @@ int addSingleCharacterToken(token *tokens, int index, char *lexeme)
 */
 int addDoubleCharacterToken(token *tokens, int index, char first, char next)
 {
+    // Check next character to ensure that it is a doublecharactertoken
     switch (first)
     {
         case '=':
@@ -260,7 +265,9 @@ token_list *lexFile(FILE *file)
     int index = 0;
     // Set the string buffer size for each word
     int maxBufferSize = 100;
-    char *buffer = malloc(sizeof(char) * maxBufferSize);
+
+    // Calloc memor to ensure that the tokens that haven't been defined are set to 0
+    char *buffer = calloc(sizeof(char), maxBufferSize);
     if (buffer == NULL)
     {
         puts("Memory allocation failed");
@@ -320,7 +327,8 @@ token_list *lexFile(FILE *file)
                 index++; 
             }
         }
-        // printf("%s", buffer); Check to see if it is reading through each character of the file
+        
+        // printf("%s", buffer); DEBUGGING: Check to see if it is reading through each character of the file
         
         // Read next char to continue loop
         c = fgetc(file);
