@@ -459,7 +459,10 @@ void freeFunc(function *f)
     {
         // Make sure that the statement is only freed if it exists
         // Protects agaisnt invalid reads when the statement fails to parse and the structs need to be cleaned up
-        freeStatement(f->statements[i]);
+        if (f->statements[i] != NULL)
+        {
+            freeStatement(f->statements[i]);
+        }
     }
     free(f->statements);
     free(f);
