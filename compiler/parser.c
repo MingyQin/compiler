@@ -190,6 +190,35 @@ statement *parseStatement()
     expression *e;
 
     switch (tok->type) {
+        // Integer definition
+        case KEYWORD_INT:
+            s->type = ASSIGN;
+            // Check for equals sign
+            tok = nextToken();
+            if (tok == NULL)
+            {
+                printf("Missing assignment operator\n");
+                free(s);
+                return NULL;
+            }
+            if (tok != ASSIGN)
+            {
+                printf("Missing assignment operator\n");
+                free(s);
+                return NULL;
+            }
+
+            // Get the expression after the 
+            e = parseExpression(0);
+            if (e == NULL)
+            {
+                printf("Missing expression after assigment\n");
+                free(s);
+                return NULL;
+            }
+            s->exp = e;
+            break;
+
         // Return statement
         case RETURN:
             s->type = RETURN;
@@ -203,6 +232,7 @@ statement *parseStatement()
             }
             s->exp = e;
             break;
+        
         // Normal expression
         default:
             s->type = EXP;

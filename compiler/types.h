@@ -68,7 +68,7 @@ typedef struct variable {
 } variable;
  
 typedef struct expression {
-    int type; //Uses types from keywords.h
+    int type; //Uses types from keywords.h UNARY_OP, BINARY_OP, VARIABLE, and CONST
     int value;
     unaryOp *unOp;
     binaryOp *binOp;
@@ -76,7 +76,7 @@ typedef struct expression {
 } expression;
 
 typedef struct {
-    int type; // Uses types from the keywords.h
+    int type; // Uses types from the keywords.h = ASSIGN, RETURN, EXP
     expression *exp;
 } statement;
 

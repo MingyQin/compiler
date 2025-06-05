@@ -1,4 +1,5 @@
 int main()
 {
-    return 2 == 2
+    
+    return (3==-2) && (1 == -2);
 }
