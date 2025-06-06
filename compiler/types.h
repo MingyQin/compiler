@@ -63,8 +63,8 @@ typedef struct {
 
 // Only supports integer variables for now
 typedef struct variable {
-    int value;
-    char *id; 
+    int id; // Unique integer ID for the integer map
+    char *name;  //The name of the variable in the 
 } variable;
  
 typedef struct expression {
@@ -72,12 +72,13 @@ typedef struct expression {
     int value;
     unaryOp *unOp;
     binaryOp *binOp;
-    variable *var;
+    variable *var; // Variable when it is being referenced 
 } expression;
 
 typedef struct {
     int type; // Uses types from the keywords.h = ASSIGN, RETURN, EXP
     expression *exp;
+    variable *var; // Variable during assignment
 } statement;
 
 typedef struct {

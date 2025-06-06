@@ -6,6 +6,9 @@
 #include "tokens.h"
 #include "keywords.h"
 
+// Variable for the next VarId 
+// 1st variable has id of 1
+int nextVarId = 0;
 
 program *parseProgram()
 {
@@ -191,8 +194,41 @@ statement *parseStatement()
 
     switch (tok->type) {
         // Integer definition
-        case KEYWORD_INT:
+        case KEYWORD_INT:            
             s->type = ASSIGN;
+
+            // Check for variable name
+            tok = nextToken();
+            if (tok == NULL)
+            {
+                printf("Missing variable name\n");
+                free(s);
+                return NULL;
+            }
+            if (tok != IDENTIFIER)
+            {
+                printf("Missing variable name\n");
+                free(s);
+                return NULL;
+            }
+
+            // Create the variable
+            variable *v = malloc(sizeof(variable));
+            if (v == NULL)
+            {
+                printf("Error allocating memory\n");
+                free(s);
+                return NULL;
+            }
+
+            // Set the variable name
+            v->name = tok->lexeme;
+
+            // Generate 
+            v->id = generateVarId();
+
+            
+
             // Check for equals sign
             tok = nextToken();
             if (tok == NULL)
@@ -311,6 +347,7 @@ expression *parseExpression(int bp)
     }
     return e;
 }
+
 
 // operatorToken should be a binaryOp token
 binaryOp *parseBinaryOp(expression *left, token *operatorToken)
@@ -473,6 +510,12 @@ int getOperatorPrecedence(token *tok)
     return -1;
 }
 
+int generateVarId()
+{
+    nextVarId++;
+    return nextVarId;
+}
+
 void freeProgram(program *p)
 {
     freeFunc(p->func);
@@ -500,6 +543,7 @@ void freeFunc(function *f)
 void freeStatement(statement *s)
 {
     freeExpression(s->exp);
+    free(s->var);
     free(s);
 }
 
