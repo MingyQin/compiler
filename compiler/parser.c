@@ -205,7 +205,7 @@ statement *parseStatement()
                 free(s);
                 return NULL;
             }
-            if (tok != IDENTIFIER)
+            if (tok->type != IDENTIFIER)
             {
                 printf("Missing variable name\n");
                 free(s);
@@ -226,7 +226,9 @@ statement *parseStatement()
 
             // Generate 
             v->id = generateVarId();
-
+            
+            // Set variable
+            s->var = v;
             
 
             // Check for equals sign
@@ -235,12 +237,14 @@ statement *parseStatement()
             {
                 printf("Missing assignment operator\n");
                 free(s);
+                free(v);
                 return NULL;
             }
-            if (tok != ASSIGN)
+            if (tok->type != ASSIGN)
             {
                 printf("Missing assignment operator\n");
                 free(s);
+                free(v);
                 return NULL;
             }
 
@@ -249,7 +253,9 @@ statement *parseStatement()
             if (e == NULL)
             {
                 printf("Missing expression after assigment\n");
+                // Free created structs
                 free(s);
+                free(v);
                 return NULL;
             }
             s->exp = e;
@@ -267,11 +273,13 @@ statement *parseStatement()
                 return NULL;
             }
             s->exp = e;
+            s->var= NULL;
             break;
         
         // Normal expression
         default:
             s->type = EXP;
+            s->var = NULL;
             // Get expression
             // Start with the lowest precedence level
             e = parseExpression(0);

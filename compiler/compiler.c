@@ -83,10 +83,10 @@ int main(int argc, char *argv[])
 
     
     // Traverse the AST
-    writeFunction(outFile, ast->func);
+    //writeFunction(outFile, ast->func);
 
     // Ensure the file ends with a newline
-    fprintf(outFile, "\n");
+    //fprintf(outFile, "\n");
 
     // Free the tokens 
     freeTokens(tokens);

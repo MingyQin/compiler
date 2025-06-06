@@ -42,9 +42,20 @@ void printExpression(expression *e)
 // All statements are return statements for now
 void printStatement(statement *s)
 {
-    printf("\tRETURN ");
-    printExpression(s->exp);
-    printf("\n");
+    switch (s->type)
+    {
+        case RETURN:
+            printf("\tRETURN ");
+            printExpression(s->exp);
+            printf("\n");
+            break;
+        case ASSIGN:
+            printf("\t%s = ", s->var->name);
+            printExpression(s->exp);
+            printf(";\n");
+            break;
+    }
+    
 }
 
 void printFunction(function *f)
