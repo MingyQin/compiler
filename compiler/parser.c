@@ -337,7 +337,8 @@ expression *parseExpression(int bp)
     while (getOperatorPrecedence(next) > bp)
     {
         current = nextToken();
-        e->binOp = parseBinaryOp(e, current);
+        // Left side of expression takes lower priority than the rightside
+        e->binOp = parseBinaryOp(e, current); // Supply the current expression as the left part 
         e->type = BINARY_OP; // This changes it the first time then repeatedly changes it to binary_op redundantly after
         if (e->binOp == NULL) // Ensure that there wasn't an error parsing the binaryOp
         {
@@ -380,6 +381,7 @@ binaryOp *parseBinaryOp(expression *left, token *operatorToken)
     e->binOp = left->binOp;
     e->unOp = left->unOp;
 
+    // Set the left expression and the operator type
     b->expL = e;
     b->operator = operatorToken->type;
     
