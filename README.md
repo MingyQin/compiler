@@ -62,5 +62,14 @@ Pratt Parsing
     - Recursion = right associativity 
         - Redefines and isolates the leftSide of a binaryOp into its own expression in order to group higher precedence operations
         - Ex: 2+2*2 -> 2+(2*2)
+    - Parenthesis
+        - Resets the expression precedence to 0 -> allows for any level precedence operators to be enclosed within the parenthesis
+        - Represents the highest level precedence because inside parenthesis will always be grouped together regardless of the precedence of the operators inside
+    - parseInitial()
+        - Responsible for generating the actual terms of the binaryOps
+        - Can parse off integers, variables, and parenthesis
+    - parseBinaryOp()
+        - Responsible for tying together the left and right expressions for an operation
+        - Just serves to group terms together in the approriate way according to precedence
 
         
