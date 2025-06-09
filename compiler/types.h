@@ -45,6 +45,10 @@ typedef struct {
     int nextToken;
 } token_list;
 
+typedef struct {
+    variable **vars;
+    int maxSize;
+} varMap;
 
 // Structs for the AST
 

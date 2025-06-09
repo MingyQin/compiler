@@ -5,10 +5,12 @@
 #include "parser.h"
 #include "tokens.h"
 #include "keywords.h"
+#include "variables.h"
 
-// Variable for the next VarId 
-// 1st variable has id of 1
-int nextVarId = 0;
+
+
+// map of variables 
+// Memory is freed when expressions are free'd
 
 program *parseProgram()
 {
@@ -229,6 +231,15 @@ statement *parseStatement()
             
             // Set variable
             s->var = v;
+
+            // Add variable to the map
+            // If it fails then return
+            if (addVariable(v) == EXIT_FAILURE)
+            {
+                free(v);
+                free(s);
+                return NULL;
+            }
             
 
             // Check for equals sign
@@ -452,6 +463,12 @@ expression *parseInitial()
             return NULL;
         }
     }
+    else if (tok->type == IDENTIFIER) {
+        e->type = VARIABLE;
+        e->binOp = NULL;
+        e->value = -1;
+        e->
+    }
     else 
     {
         free(e);
@@ -520,12 +537,6 @@ int getOperatorPrecedence(token *tok)
     return -1;
 }
 
-int generateVarId()
-{
-    nextVarId++;
-    return nextVarId;
-}
-
 void freeProgram(program *p)
 {
     freeFunc(p->func);
@@ -550,6 +561,7 @@ void freeFunc(function *f)
     free(f->statements);
     free(f);
 }
+
 void freeStatement(statement *s)
 {
     freeExpression(s->exp);

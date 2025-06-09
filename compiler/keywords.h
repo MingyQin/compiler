@@ -30,5 +30,6 @@
 #define UNARY_OP      24
 #define EXP           25
 #define ASSIGN        26
+#define VARIABLE      27
 
 #endif

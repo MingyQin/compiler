@@ -6,6 +6,7 @@
         "compare": "c",
         "limits": "c",
         "new": "c",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "keywords.h": "c"
     }
 }
