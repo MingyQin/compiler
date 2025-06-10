@@ -1,4 +1,4 @@
-compiler: compiler.c lexer.c parser.c codegen.c pprint.c types.h
+compiler: compiler.c lexer.c parser.c codegen.c pprint.c types.h variables.c
 	gcc -g -o compiler compiler.c lexer.c parser.c codegen.c pprint.c variables.c
 
 test: test.c lexer.c

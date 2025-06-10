@@ -1,6 +1,7 @@
 #include "types.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 // List of variables
 static varMap var_Map;
@@ -9,6 +10,7 @@ static varMap var_Map;
 // 1st variable has id of 1
 // Also serves as the index of variable struct in the varMap
 int nextVarId = -1;
+// Also used by getIndex to loop through each variable
 
 // Create var_Map
 int initVariables()
@@ -23,10 +25,22 @@ int initVariables()
     return EXIT_SUCCESS;
 }
 
-// Get index of 
-int getIndex()
+void freeVariables()
 {
+    free(var_Map.vars);
+}
 
+// Get index of variable using the variable identifier
+variable* getVariable(char *id)
+{
+    for (int i = 0; i <= nextVarId; i++)
+    {
+        if (strcmp(var_Map.vars[i]->name, id) == 0)
+        {
+            return var_Map.vars[i];
+        }
+    }
+    return NULL;
 }
 
 int addVariable(variable *v)

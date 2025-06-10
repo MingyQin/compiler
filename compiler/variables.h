@@ -5,5 +5,7 @@
 int initVariables();
 int addVariable(variable *v);
 int generateVarId();
+variable* getVariable(char *id);
+void freeVariables();
 
 #endif

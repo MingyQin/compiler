@@ -14,6 +14,12 @@
 
 program *parseProgram()
 {
+    // Create the variables 
+    if (initVariables() == EXIT_FAILURE)
+    {
+        printf("Memory allocation failed\n");
+        return NULL;
+    }
     program *p = malloc(sizeof(program));
     if (p == NULL)
     {
@@ -28,6 +34,9 @@ program *parseProgram()
         return NULL;
     }
     p->func = f;
+
+    // Free variables list
+    freeVariables();
     return p;
 }
 
@@ -225,6 +234,7 @@ statement *parseStatement()
 
             // Set the variable name
             v->name = tok->lexeme;
+            printf("Variable name = %s\n", v->name);
 
             // Generate 
             v->id = generateVarId();
@@ -434,12 +444,14 @@ expression *parseInitial()
         // Default values for the rest of the fields
         e->binOp = NULL;
         e->unOp = NULL;
+        e->var = NULL;
     }
     else if (tok->type == MINUS || tok->type == BITWISE_COMP || tok->type == LOGICAL_NEG) //UnaryOp
     {
         e->type = UNARY_OP;
         int value = -1;
         e->binOp = NULL;
+        e->var = NULL;
         // Parse for the unarOp
         e->unOp = parseUnaryOp(tok);
         if (e->unOp == NULL)
@@ -467,7 +479,16 @@ expression *parseInitial()
         e->type = VARIABLE;
         e->binOp = NULL;
         e->value = -1;
-        
+        e->unOp = NULL;
+        // Attempt to get the variable from the var_Map
+        // It should already be defined if it is being referenced in an expression
+        e->var = getVariable(tok->lexeme);
+        if (e->var == NULL)
+        {
+            free(e);
+            printf("Reference to uninstiantiated variable: %s\n", tok->lexeme);
+            return NULL;
+        }
     }
     else 
     {

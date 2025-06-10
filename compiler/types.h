@@ -45,10 +45,7 @@ typedef struct {
     int nextToken;
 } token_list;
 
-typedef struct {
-    variable **vars;
-    int maxSize;
-} varMap;
+
 
 // Structs for the AST
 
@@ -70,6 +67,11 @@ typedef struct variable {
     int id; // Unique integer ID for the integer map
     char *name;  //The name of the variable in the 
 } variable;
+
+typedef struct {
+    variable **vars;
+    int maxSize;
+} varMap;
  
 typedef struct expression {
     int type; //Uses types from keywords.h UNARY_OP, BINARY_OP, VARIABLE, and CONST

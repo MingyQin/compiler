@@ -25,18 +25,20 @@ void printBinaryOp(binaryOp *b)
 
 void printExpression(expression *e)
 {
-    if (e->type == BINARY_OP)
+    switch (e->type)
     {
-        printBinaryOp(e->binOp);
-       
-    }
-    else if (e->type == UNARY_OP)
-    {
-        printUnaryOp(e->unOp);
-    }
-    else if (e->type == INT)
-    {
-        printf("%d", e->value);
+        case BINARY_OP:
+            printBinaryOp(e->binOp);
+            break;
+        case UNARY_OP:
+            printUnaryOp(e->unOp);
+            break;
+        case INT:
+            printf("%d", e->value);
+            break;
+        case VARIABLE:
+            printf("%s", e->var);
+            break;
     }
 }
 // All statements are return statements for now
