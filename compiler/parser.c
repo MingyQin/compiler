@@ -14,12 +14,6 @@
 
 program *parseProgram()
 {
-    // Create the variables 
-    if (initVariables() == EXIT_FAILURE)
-    {
-        printf("Memory allocation failed\n");
-        return NULL;
-    }
     program *p = malloc(sizeof(program));
     if (p == NULL)
     {
@@ -35,8 +29,6 @@ program *parseProgram()
     }
     p->func = f;
 
-    // Free variables list
-    freeVariables();
     return p;
 }
 
@@ -234,7 +226,6 @@ statement *parseStatement()
 
             // Set the variable name
             v->name = tok->lexeme;
-            printf("Variable name = %s\n", v->name);
 
             // Generate 
             v->id = generateVarId();

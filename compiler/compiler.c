@@ -10,6 +10,7 @@
 #include "tokens.h"
 #include "codegen.h"
 #include "pprint.h"
+#include "variables.h"
 
 // Used for getting the next token in the nextToken() function
 static token_list *tokens;
@@ -47,6 +48,12 @@ int main(int argc, char *argv[])
 
     // Parse the tokens into an AST
 
+    // Create the variables 
+    if (initVariables() == EXIT_FAILURE)
+    {
+        printf("Memory allocation failed\n");
+        return NULL;
+    }
     
     // Root node of the AST
     program *ast = parseProgram();
@@ -90,6 +97,9 @@ int main(int argc, char *argv[])
 
     // Free the tokens 
     freeTokens(tokens);
+
+    // Free the variables list
+    freeVariables();
 
     // Free the AST
     freeProgram(ast);
