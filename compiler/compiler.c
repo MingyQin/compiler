@@ -59,6 +59,7 @@ int main(int argc, char *argv[])
     if (ast == NULL)
     {
         printf("Couldn't create AST\n");
+        freeVariables();
         freeTokens(tokens);
         fclose(file);
         return EXIT_FAILURE;
