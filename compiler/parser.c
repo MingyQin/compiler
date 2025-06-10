@@ -388,10 +388,12 @@ binaryOp *parseBinaryOp(expression *left, token *operatorToken)
         free(b);
         return NULL;
     }
+    // COPY EVERY SINGLE ASPECT OF THE LEFT EXPRESSION INCLUDING NEW VALUES OR ELSE IT WILL ERASE CRUCIAL DATA IN THE LEFT EXPRESSION
     e->value = left->value;
     e->type = left->type;
     e->binOp = left->binOp;
     e->unOp = left->unOp;
+    e->var = left->var;
 
     // Set the left expression and the operator type
     b->expL = e;

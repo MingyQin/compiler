@@ -9,7 +9,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/compiler/compiler",
-            "args": ["${workspaceFolder}/compiler/return_2.c"],
+            "args": ["${workspaceFolder}/compiler/test.c"],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
             "environment": [],

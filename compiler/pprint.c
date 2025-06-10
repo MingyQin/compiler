@@ -37,7 +37,7 @@ void printExpression(expression *e)
             printf("%d", e->value);
             break;
         case VARIABLE:
-            printf("%s", e->var);
+            printf("%s", e->var->name);
             break;
     }
 }
@@ -52,7 +52,8 @@ void printStatement(statement *s)
             printf("\n");
             break;
         case ASSIGN:
-            printf("\t%s = ", s->var->name);
+            printf("\tINT ");
+            printf("%s = ", s->var->name);
             printExpression(s->exp);
             printf(";\n");
             break;

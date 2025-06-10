@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
     {
         puts("Not enough arguments supplied");
         puts("Usage: ./lexer filename");
-        return 1;
+        return EXIT_FAILURE;
     }
 
     // Open file conneciton
@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
     if (file == NULL)
     {
         printf("File \"%s\" not found\n", argv[1]);
-        return 1;
+        return EXIT_FAILURE;
     }
     
     
@@ -39,22 +39,21 @@ int main(int argc, char *argv[])
     if (tokens == NULL)
     {
         puts("Failed to create token list\n");
-        return 1;
+        return EXIT_FAILURE;
     }
    
 
     // Print tokens
     printTokens();
 
-    // Parse the tokens into an AST
-
     // Create the variables 
     if (initVariables() == EXIT_FAILURE)
     {
         printf("Memory allocation failed\n");
-        return NULL;
+        return EXIT_FAILURE;
     }
-    
+
+    // Parse the tokens into an AST
     // Root node of the AST
     program *ast = parseProgram();
     if (ast == NULL)
@@ -62,7 +61,7 @@ int main(int argc, char *argv[])
         printf("Couldn't create AST\n");
         freeTokens(tokens);
         fclose(file);
-        return 1;
+        return EXIT_FAILURE;
     }
 
     // Prettyprint the AST
@@ -85,7 +84,7 @@ int main(int argc, char *argv[])
     if (outFile== NULL)
     {
         printf("Couldn't open outfile\n");
-        return 1;
+        return EXIT_FAILURE;
     }
 
     
