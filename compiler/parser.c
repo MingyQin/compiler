@@ -467,7 +467,7 @@ expression *parseInitial()
         e->type = VARIABLE;
         e->binOp = NULL;
         e->value = -1;
-        e->
+        
     }
     else 
     {

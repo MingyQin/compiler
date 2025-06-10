@@ -23,6 +23,12 @@ int initVariables()
     return EXIT_SUCCESS;
 }
 
+// Get index of 
+int getIndex()
+{
+
+}
+
 int addVariable(variable *v)
 {
     // Resize the var_Map if it is over the max size
