@@ -7,5 +7,6 @@ int addVariable(variable *v);
 int generateVarId();
 variable* getVariable(char *id);
 void freeVariables();
+variable* createVariable(char *name);
 
 #endif

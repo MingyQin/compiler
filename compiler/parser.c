@@ -213,35 +213,18 @@ statement *parseStatement()
                 printf("Missing variable name\n");
                 free(s);
                 return NULL;
-            }
+            }            
 
-            // Create the variable
-            variable *v = malloc(sizeof(variable));
+            // Attempt to create variable
+            variable *v = createVariable(tok->lexeme);
             if (v == NULL)
             {
-                printf("Error allocating memory\n");
+                printf("Error creating variable\n");
                 free(s);
-                return NULL;
-            }
-
-            // Set the variable name
-            v->name = tok->lexeme;
-
-            // Generate 
-            v->id = generateVarId();
-            
-            // Set variable
-            s->var = v;
-
-            // Add variable to the map
-            // If it fails then return
-            if (addVariable(v) == EXIT_FAILURE)
-            {
                 free(v);
-                free(s);
                 return NULL;
             }
-            
+            s->var = v;
 
             // Check for equals sign
             tok = nextToken();

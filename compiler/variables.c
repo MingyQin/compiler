@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "variables.h"
 
 // List of variables
 static varMap var_Map;
@@ -31,11 +32,11 @@ void freeVariables()
 }
 
 // Get index of variable using the variable identifier
-variable* getVariable(char *id)
+variable* getVariable(char *name)
 {
     for (int i = 0; i <= nextVarId; i++)
     {
-        if (strcmp(var_Map.vars[i]->name, id) == 0)
+        if (strcmp(var_Map.vars[i]->name, name) == 0)
         {
             return var_Map.vars[i];
         }
@@ -43,6 +44,7 @@ variable* getVariable(char *id)
     return NULL;
 }
 
+// Create a variable from its identifier
 int addVariable(variable *v)
 {
     // Resize the var_Map if it is over the max size
@@ -53,11 +55,39 @@ int addVariable(variable *v)
     }
     if (var_Map.vars == NULL)
     {
+        printf("Error reallocating memory\n");
         return EXIT_FAILURE;
     }
 
     var_Map.vars[v->id] = v;
     return EXIT_SUCCESS;
+}
+
+// Create variable from variable name
+variable* createVariable(char *name)
+{
+    variable *v = malloc(sizeof(variable));
+    if (v == NULL)
+    {
+        printf("Error allocating memory\n");
+        return NULL;
+    }
+
+    // Check if variable exists already
+    if (getVariable(name) != NULL)
+    {
+        printf("Variable %s is already declared\n", name);
+        free(v);
+        return NULL;
+    }
+    
+    // Create variable information
+    v->id = generateVarId();
+    v->name = name;
+
+    // Add variable to the map
+    addVariable(v);
+    return v;
 }
 
 int generateVarId()
