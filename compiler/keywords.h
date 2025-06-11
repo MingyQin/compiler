@@ -34,5 +34,6 @@
 #define EXP           25
 #define ASSIGN        26
 #define VARIABLE      27
+#define DECLARE       28
 
 #endif

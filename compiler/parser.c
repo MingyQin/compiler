@@ -198,7 +198,7 @@ statement *parseStatement()
     switch (tok->type) {
         // Integer definition
         case KEYWORD_INT:            
-            s->type = ASSIGN;
+            s->type = DECLARE;
 
             // Check for variable name
             tok = nextToken();

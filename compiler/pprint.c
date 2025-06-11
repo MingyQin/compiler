@@ -51,7 +51,7 @@ void printStatement(statement *s)
             printExpression(s->exp);
             printf("\n");
             break;
-        case ASSIGN:
+        case DECLARE:
             printf("\tINT ");
             printf("%s = ", s->var->name);
             printExpression(s->exp);
