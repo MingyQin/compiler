@@ -112,7 +112,7 @@ function *parseFunc()
     {
         statements[snum] = parseStatement();
         // If the statement couldn't be parsed return NULL
-        if (statements == NULL)
+        if (statements[snum] == NULL)
         {
             // Free the remaining statements in the function
             f->numStatements = snum; // Used to traverse through the number of statements and free them
@@ -221,7 +221,6 @@ statement *parseStatement()
             {
                 printf("Error creating variable\n");
                 free(s);
-                free(v);
                 return NULL;
             }
             s->var = v;
