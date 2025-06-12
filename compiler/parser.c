@@ -272,7 +272,7 @@ statement *parseStatement()
 
             // Check for equals sign
             tok = nextToken();
-            if (tok == NULL || tok->type != EQUALS)
+            if (tok == NULL || tok->type != ASSIGN)
             {
                 printf("Missing equals sign\n");
                 return NULL;
@@ -597,7 +597,7 @@ void freeFunc(function *f)
 void freeStatement(statement *s)
 {
     freeExpression(s->exp);
-    free(s->var);
+    //free(s->var);
     free(s);
 }
 

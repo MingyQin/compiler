@@ -28,6 +28,10 @@ int initVariables()
 
 void freeVariables()
 {
+    for (int i = 0; i <= nextVarId; i++)
+    {
+        free(var_Map.vars[i]);
+    }
     free(var_Map.vars);
 }
 
