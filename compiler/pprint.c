@@ -103,13 +103,13 @@ char *getOperator(token_type operator)
             characters = "+";
             break;
         case MINUS:
-            characters = "+";
+            characters = "-";
             break;
         case MULTIPLY:
-            characters = "+";
+            characters = "*";
             break;
         case DIVIDE:
-            characters = "+";
+            characters = "/";
             break;
         case AND:
             characters = "&&";
@@ -136,7 +136,7 @@ char *getOperator(token_type operator)
             characters = "<";
             break;
         default:
-            characters = "?";
+            characters = "<unknown operator>";
             break;
     }
     return characters;

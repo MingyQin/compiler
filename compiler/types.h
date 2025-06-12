@@ -66,6 +66,7 @@ typedef struct {
 typedef struct variable {
     int id; // Unique integer ID for the integer map
     char *name;  //The name of the variable in the 
+    int ebp_offset; // Amount offsetted down from EBP (location of the variable on the stack during code generation)
 } variable;
 
 typedef struct {

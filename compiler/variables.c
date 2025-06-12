@@ -13,6 +13,8 @@ static varMap var_Map;
 int nextVarId = -1;
 // Also used by getIndex to loop through each variable
 
+int stack_offset = 8;
+
 // Create var_Map
 int initVariables()
 {
@@ -88,7 +90,9 @@ variable* createVariable(char *name)
     // Create variable information
     v->id = generateVarId();
     v->name = name;
-
+    v->ebp_offset = stack_offset; // Temporary before code generation
+    
+    stack_offset += 8; // Increment the stack offset
     // Add variable to the map
     addVariable(v);
     return v;
