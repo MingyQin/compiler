@@ -82,7 +82,7 @@ typedef struct expression {
 } expression;
 
 typedef struct {
-    int type; // Uses types from the keywords.h = ASSIGN, RETURN, EXP
+    int type; // Uses types from the keywords.h = ASSIGN, RETURN, EXP, DECLARE
     expression *exp;
     variable *var; // Variable during assignment
 } statement;

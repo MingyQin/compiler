@@ -57,6 +57,11 @@ void printStatement(statement *s)
             printExpression(s->exp);
             printf(";\n");
             break;
+        case ASSIGN:
+            printf("%s = ", s->var->name);
+            printExpression(s->exp);
+            printf(";\n");
+            break;
     }
     
 }

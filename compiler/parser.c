@@ -189,11 +189,12 @@ statement *parseStatement()
     token *tok = nextToken();
     if (tok == NULL)
     {
-        printf("Missing return statement\n");
+        printf("Missing statement\n");
         free(s);
         return NULL;
     }
     expression *e;
+    variable *v;
 
     switch (tok->type) {
         // Integer definition
@@ -216,7 +217,7 @@ statement *parseStatement()
             }            
 
             // Attempt to create variable
-            variable *v = createVariable(tok->lexeme);
+            v = createVariable(tok->lexeme);
             if (v == NULL)
             {
                 printf("Error creating variable\n");
@@ -254,6 +255,39 @@ statement *parseStatement()
             }
             s->exp = e;
             break;
+        // Variable assignment/reassignment
+        case IDENTIFIER: 
+            s->type = ASSIGN;
+
+            // Get the variable 
+            // Check if the variable has been previously declared
+            v = getVariable(tok->lexeme);
+            if (v == NULL)
+            {
+                printf("Reference to undeclared variable %s\n", tok->lexeme);
+                free(s);
+                return NULL;
+            }
+            s->var = v;
+
+            // Check for equals sign
+            tok = nextToken();
+            if (tok == NULL || tok->type != EQUALS)
+            {
+                printf("Missing equals sign\n");
+                return NULL;
+            }
+
+            // Get the expression with the variable
+            e = parseExpression(0);
+            if (e == NULL)
+            {
+                printf("Couldn't parse expression for assignment\n");
+                return NULL;
+            }
+            s->exp = e;
+
+            break;
 
         // Return statement
         case RETURN:
@@ -263,6 +297,7 @@ statement *parseStatement()
             e = parseExpression(0);
             if (e == NULL)
             {
+                printf("Return missing expression\n");
                 free(s);
                 return NULL;
             }
@@ -404,6 +439,7 @@ expression *parseInitial()
         printf("Memory allocation failed\n");
         return NULL;
     }
+
 
     token *tok = nextToken();
     if (tok == NULL)
