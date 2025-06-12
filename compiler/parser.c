@@ -274,6 +274,7 @@ statement *parseStatement()
             tok = nextToken();
             if (tok == NULL || tok->type != ASSIGN)
             {
+                free(s);
                 printf("Missing equals sign\n");
                 return NULL;
             }
@@ -282,6 +283,7 @@ statement *parseStatement()
             e = parseExpression(0);
             if (e == NULL)
             {
+                free(s);
                 printf("Couldn't parse expression for assignment\n");
                 return NULL;
             }
